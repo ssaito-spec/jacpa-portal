@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JACPA東京FC ポータル 2025-2026</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Hiragino Kaku Gothic ProN', 'Helvetica Neue', sans-serif;
+            background: #f5f5f5;
+            color: #1a1a1a;
+            min-height: 100vh;
+        }
+        :root {
+            --green: rgb(0, 100, 60);
+            --green-light: rgba(0, 100, 60, 0.08);
+            --green-mid: rgba(0, 100, 60, 0.15);
+            --orange: #e67e22;
+        }
+
+        /* Header */
+        .header {
+            background: var(--green);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .header img { width: 40px; height: 40px; border-radius: 8px; }
+        .header-text h1 { font-size: 18px; font-weight: 800; }
+        .header-text .season { font-size: 11px; opacity: 0.8; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 72px;
+            z-index: 99;
+        }
+        .tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab.active { color: var(--green); border-bottom-color: var(--green); }
+        .tab-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+
+        /* Content */
+        .content { max-width: 800px; margin: 0 auto; padding: 16px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Home stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .stat-value { font-size: 28px; font-weight: 900; color: var(--green); }
+        .stat-label { font-size: 11px; color: #888; margin-top: 4px; }
+
+        /* Player selector */
+        .player-selector {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .player-selector label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .player-selector select {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            color: #1a1a1a;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23888' stroke-width='2'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+        .player-selector select:focus {
+            outline: none;
+            border-color: var(--green);
+        }
+
+        /* Player stats summary */
+        .player-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .player-stat {
+            background: white;
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .player-stat .val { font-size: 24px; font-weight: 900; color: var(--green); }
+        .player-stat .lbl { font-size: 10px; color: #888; margin-top: 2px; }
+
+        /* Match card */
+        .match-card {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        .match-header {
+            padding: 14px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.2s;
+        }
+        .match-header:hover { background: #fafafa; }
+        .match-date {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--green);
+            white-space: nowrap;
+            min-width: 50px;
+        }
+        .match-title {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .match-badge {
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .badge-official { background: var(--green-mid); color: var(--green); }
+        .badge-tm { background: #f0f0f0; color: #888; }
+        .badge-mixed { background: #fff3e0; color: var(--orange); }
+        .match-toggle {
+            font-size: 16px;
+            color: #ccc;
+            transition: transform 0.3s;
+        }
+        .match-card.open .match-toggle { transform: rotate(180deg); }
+
+        .match-detail { display: none; padding: 0 16px 16px; }
+        .match-card.open .match-detail { display: block; }
+
+        .match-info {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .match-info span { margin-right: 12px; }
+
+        /* Game row */
+        .game-row {
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 13px;
+        }
+        .game-row:last-child { border-bottom: none; }
+        .game-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .game-num {
+            font-weight: 800;
+            color: var(--green);
+            min-width: 24px;
+        }
+        .game-opponent { font-weight: 600; flex: 1; }
+        .game-score {
+            font-weight: 900;
+            font-size: 15px;
+            font-family: 'Helvetica Neue', sans-serif;
+        }
+        .game-result {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 22px;
+            font-size: 11px;
+            font-weight: 800;
+            color: white;
+        }
+        .result-W { background: var(--green); }
+        .result-L { background: #e74c3c; }
+        .result-D { background: #f39c12; }
+        .game-players {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+            line-height: 1.6;
+        }
+        .game-players .highlight { color: var(--green); font-weight: 700; }
+        .game-players .gk-tag {
+            background: #f0f0f0;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+        .game-scorers {
+            font-size: 11px;
+            color: var(--green);
+            margin-top: 2px;
+        }
+
+        /* Video button */
+        .video-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: #ff0000;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 10px;
+            transition: opacity 0.2s;
+        }
+        .video-btn:hover { opacity: 0.85; }
+
+        /* Video list */
+        .video-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .video-card .v-date {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--green);
+            min-width: 50px;
+        }
+        .video-card .v-title {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .video-card .v-link {
+            background: #ff0000;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* Section title */
+        .section-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #333;
+            margin: 20px 0 12px;
+            padding-left: 10px;
+            border-left: 4px solid var(--green);
+        }
+
+        /* Record bar */
+        .record-bar {
+            display: flex;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0 16px;
+        }
+        .record-w { background: var(--green); }
+        .record-d { background: #f39c12; }
+        .record-l { background: #e74c3c; }
+
+        /* Tournament badge */
+        .tournament-badge {
+            display: inline-block;
+            background: var(--green);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-top: 4px;
+        }
+
+        /* Nav link */
+        .nav-link {
+            display: block;
+            text-align: center;
+            padding: 14px;
+            color: var(--green);
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            margin-top: 12px;
+        }
+
+        /* No data */
+        .no-data {
+            text-align: center;
+            color: #bbb;
+            padding: 40px 20px;
+            font-size: 14px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #bbb;
+            font-size: 12px;
+        }
+
+        /* Links */
+        .page-links {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .page-link {
+            flex: 1;
+            display: block;
+            padding: 14px;
+            background: white;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--green);
+            font-weight: 700;
+            font-size: 13px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: transform 0.2s;
+        }
+        .page-link:hover { transform: translateY(-2px); }
+        .page-link .link-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+
+        /* Timeline bars */
+        .tl-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; }
+        .tl-label { min-width:45px; font-weight:700; color:#555; text-align:right; }
+        .tl-bar { flex:1; display:flex; height:20px; border-radius:4px; overflow:hidden; }
+        .tl-w { background:var(--green); }
+        .tl-d { background:#f39c12; }
+        .tl-l { background:#e74c3c; }
+        .tl-text { min-width:80px; font-size:11px; color:#888; }
+
+        /* Tournament card */
+        .tournament-card {
+            background:white; border-radius:12px; padding:16px; margin-bottom:10px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.06);
+        }
+        .tc-header { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+        .tc-name { font-size:15px; font-weight:800; flex:1; }
+        .tc-result { font-size:13px; font-weight:700; padding:4px 10px; border-radius:6px; }
+        .tc-dates { font-size:11px; color:#888; margin-bottom:8px; }
+        .tc-games { font-size:12px; color:#555; line-height:1.8; }
+
+        /* Opponent card */
+        .opp-card {
+            background:white; border-radius:12px; padding:14px 16px; margin-bottom:8px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.06);
+        }
+        .opp-header { display:flex; align-items:center; gap:10px; }
+        .opp-name { font-size:14px; font-weight:700; flex:1; }
+        .opp-record { font-size:13px; font-weight:700; }
+        .opp-bar { height:6px; border-radius:3px; overflow:hidden; display:flex; margin-top:6px; }
+        .opp-detail { font-size:11px; color:#888; margin-top:4px; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <img src="その他/logo.jpeg" alt="JACPA東京FC">
+    <div class="header-text">
+        <h1>JACPA東京FC</h1>
+        <div class="season">U9（3年生）2025-2026 SEASON</div>
+    </div>
+</div>
+
+<div class="tabs">
+    <div class="tab active" onclick="switchTab('home')">
+        <span class="tab-icon">&#9917;</span>HOME
+    </div>
+    <div class="tab" onclick="switchTab('player')">
+        <span class="tab-icon">&#128100;</span>マイ選手
+    </div>
+    <div class="tab" onclick="switchTab('matches')">
+        <span class="tab-icon">&#128203;</span>試合
+    </div>
+    <div class="tab" onclick="switchTab('videos')">
+        <span class="tab-icon">&#9654;</span>動画
+    </div>
+</div>
+
+<div class="content">
+    <!-- HOME TAB -->
+    <div id="tab-home" class="tab-content active">
+        <div class="section-title">シーズン成績（2025年度 / 3年生）</div>
+        <div id="home-stats" class="stats-grid"></div>
+        <div id="home-record-bar" class="record-bar"></div>
+        <div id="home-record-text" style="font-size:12px;color:#888;text-align:center;margin-bottom:20px;"></div>
+
+        <div class="section-title">月別成績</div>
+        <div id="home-timeline"></div>
+
+        <div class="section-title">大会まとめ</div>
+        <div id="home-tournaments"></div>
+
+        <div class="section-title">直近の試合</div>
+        <div id="home-recent"></div>
+
+        <div class="section-title">リンク</div>
+        <div class="page-links">
+            <a href="player_list.html" class="page-link">
+                <span class="link-icon">&#128101;</span>選手紹介
+            </a>
+            <a href="player_intro.html" class="page-link">
+                <span class="link-icon">&#127910;</span>スライドショー
+            </a>
+        </div>
+    </div>
+
+    <!-- PLAYER TAB -->
+    <div id="tab-player" class="tab-content">
+        <div class="player-selector">
+            <label>お子さんの背番号を選んでください</label>
+            <select id="player-select" onchange="renderPlayerView()">
+                <option value="">-- 選択 --</option>
+            </select>
+        </div>
+        <div id="player-stats-area" class="player-stats" style="display:none;"></div>
+        <div id="player-matches"></div>
+    </div>
+
+    <!-- MATCHES TAB -->
+    <div id="tab-matches" class="tab-content">
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+            <button onclick="showMatchView('dates')" id="btn-dates" style="flex:1;padding:10px;border:2px solid var(--green);border-radius:8px;background:var(--green);color:white;font-weight:700;font-size:13px;cursor:pointer;">試合日別</button>
+            <button onclick="showMatchView('opponents')" id="btn-opponents" style="flex:1;padding:10px;border:2px solid var(--green);border-radius:8px;background:white;color:var(--green);font-weight:700;font-size:13px;cursor:pointer;">対戦相手別</button>
+        </div>
+        <div id="matches-by-opponents" style="display:none;"></div>
+        <div class="section-title" id="matches-title">全試合結果</div>
+        <div id="matches-list"></div>
+    </div>
+
+    <!-- VIDEOS TAB -->
+    <div id="tab-videos" class="tab-content">
+        <div class="section-title">動画リンク一覧</div>
+        <div id="videos-list"></div>
+    </div>
+</div>
+
+<div class="footer">JACPA東京FC U9（3年生）2025-2026 Season Portal</div>
+
+<script>
+// ========== PLAYER DATABASE ==========
+const PLAYERS = {
+    2: { name: "優聖", romaji: "Yusei", age: "U9" },
+    3: { name: "旺佑", romaji: "Osuke", age: "U9" },
+    4: { name: "一翔", romaji: "Kazuto", age: "U9" },
+    5: { name: "#5", romaji: "", age: "U10" },
+    6: { name: "蒼汰朗", romaji: "Soutarou", age: "U9" },
+    8: { name: "葵", romaji: "Aoi", age: "U8" },
+    9: { name: "琉真", romaji: "Rihito", age: "U9" },
+    10: { name: "雅空", romaji: "Gaku", age: "U9" },
+    11: { name: "陸", romaji: "Riku", age: "U9" },
+    14: { name: "倭", romaji: "Yamato", age: "U9" },
+    15: { name: "冬悟", romaji: "Togo", age: "U9" },
+    16: { name: "秋実", romaji: "Ami", age: "U9" },
+    17: { name: "慧", romaji: "Kei", age: "U9" },
+    18: { name: "風雅", romaji: "Fuga", age: "U9" },
+    19: { name: "陽太", romaji: "Yota", age: "U9" },
+    20: { name: "慎士郎", romaji: "Shinjiro", age: "U8" },
+    22: { name: "爽汰", romaji: "Sota", age: "U9" },
+    23: { name: "#23", romaji: "", age: "U10" },
+    24: { name: "蒼之", romaji: "Soshi", age: "U9" },
+    28: { name: "然", romaji: "Zen", age: "U8" },
+    13: { name: "#13", romaji: "", age: "U9" },
+    39: { name: "#39", romaji: "", age: "" },
+    65: { name: "凌雅", romaji: "Ryoga", age: "U9" }
+};
+
+// ========== MATCH DATA ==========
+// p: all players, g: GK numbers, s: [us, them], sc: scorers, r: W/L/D
+const MATCH_DAYS = [
+    {
+        date: "2025-04-12", title: "TM vs 上尾朝日（初試合）", type: "tm",
+        venue: "上谷総合公園人工芝G", weather: "", staff: [],
+        videos: [{ label: "TM@上谷総合公園", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9XNeU1JQP2oyjdKSSnwVPtM" }],
+        note: "チーム初試合",
+        games: [
+            { n:1, o:"上尾朝日", t:"tm", p:[], g:[], s:[4,0], sc:[], r:"W", detail:"" },
+            { n:2, o:"上尾朝日", t:"tm", p:[], g:[], s:[2,0], sc:[], r:"W", detail:"" },
+            { n:3, o:"上尾朝日", t:"tm", p:[], g:[], s:[2,0], sc:[], r:"W", detail:"" },
+            { n:4, o:"上尾朝日", t:"tm", p:[], g:[], s:[3,1], sc:[], r:"W", detail:"" },
+            { n:5, o:"上尾朝日", t:"tm", p:[], g:[], s:[3,0], sc:[], r:"W", detail:"" },
+            { n:6, o:"上尾朝日", t:"tm", p:[], g:[], s:[2,0], sc:[], r:"W", detail:"" },
+            { n:7, o:"上尾朝日", t:"tm", p:[], g:[], s:[1,0], sc:[], r:"W", detail:"" },
+            { n:8, o:"上尾朝日", t:"tm", p:[], g:[], s:[3,1], sc:[], r:"W", detail:"" },
+            { n:9, o:"上尾朝日", t:"tm", p:[], g:[], s:[2,0], sc:[], r:"W", detail:"" },
+            { n:10, o:"上尾朝日", t:"tm", p:[], g:[], s:[8,0], sc:[], r:"W", detail:"" },
+            { n:11, o:"上尾朝日", t:"tm", p:[], g:[], s:[1,0], sc:[], r:"W", detail:"" },
+            { n:12, o:"上尾朝日", t:"tm", p:[], g:[], s:[2,1], sc:[], r:"W", detail:"" }
+        ]
+    },
+    {
+        date: "2025-04-19", title: "TRIANELLO CUP U9 Day1", type: "official",
+        venue: "", weather: "", staff: [],
+        videos: [{ label: "トリアネーロカップ", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9WfTrNuMSJg33PyKlqS2OUA" }],
+        note: "グループ1位",
+        games: [
+            { n:1, o:"KIDS POWER A", t:"official", p:[], g:[], s:[4,2], sc:[28,20,13,17], r:"W",
+              detail:"前半 1-0(28) / 後半 3-2(20,13,17)" },
+            { n:2, o:"フォルツァ松本", t:"official", p:[], g:[], s:[13,0], sc:[9,22,10,10,22,19,8,8,8,8,8,14,14], r:"W",
+              detail:"前半 5-0(9,22,10,10,22) / 後半 7-0(19,8,8,8,8,14,14)" },
+            { n:3, o:"中野島FC B", t:"official", p:[], g:[], s:[3,0], sc:[13,22,22], r:"W",
+              detail:"前半 3-0(13,22,22) / 後半 0-0" },
+            { n:4, o:"座間レガーレ", t:"tm", p:[], g:[], s:[1,3], sc:[19], r:"L",
+              detail:"前半 0-2 / 後半 1-1(19)" },
+            { n:5, o:"FC ALONZA", t:"tm", p:[], g:[], s:[2,2], sc:[20,10], r:"D",
+              detail:"前半 0-1 / 後半 2-1(20,10)" }
+        ]
+    },
+    {
+        date: "2025-04-20", title: "TRIANELLO CUP U9 Day2", type: "official",
+        venue: "", weather: "", staff: [],
+        videos: [{ label: "トリアネーロカップ", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9WfTrNuMSJg33PyKlqS2OUA" }],
+        note: "総合5位 / 優秀選手: #22爽汰",
+        games: [
+            { n:1, o:"FCガウーショ", t:"official", p:[], g:[], s:[0,5], sc:[], r:"L",
+              detail:"前半 0-3 / 後半 0-2" },
+            { n:2, o:"KIDS POWER A", t:"official", p:[], g:[], s:[3,2], sc:[19,18,8], r:"W",
+              detail:"前半 2-1(19,18) / 後半 1-1(8)" },
+            { n:3, o:"FC GLAUNA", t:"official", p:[], g:[], s:[1,1], sc:[22], r:"W",
+              detail:"前半 0-1 / 後半 1-0(22) PK2-1" },
+            { n:4, o:"トリアネーロ町田", t:"tm", p:[], g:[], s:[0,5], sc:[], r:"L",
+              detail:"前半 0-2 / 後半 0-3" },
+            { n:5, o:"中野島FC", t:"tm", p:[], g:[], s:[0,4], sc:[], r:"L",
+              detail:"前半 0-1 / 後半 0-3" },
+            { n:6, o:"トリアネーロ町田", t:"tm", p:[], g:[], s:[0,4], sc:[], r:"L",
+              detail:"前半 0-3 / 後半 0-1" }
+        ]
+    },
+    {
+        date: "2025-05-05", title: "市川チャレンジカップ U9", type: "official",
+        venue: "北市川フットボールフィールド", weather: "", staff: [],
+        videos: [{ label: "市川チャレンジカップ", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9XzlnBYvfFAvFlBW7qSzPo6" }],
+        note: "B群3位 → 5位",
+        games: [
+            { n:1, o:"トリアネーロ町田", t:"official", p:[], g:[], s:[0,7], sc:[], r:"L",
+              detail:"前半 0-5 / 後半 0-2" },
+            { n:2, o:"レジスタFC", t:"official", p:[], g:[], s:[1,2], sc:[24], r:"L",
+              detail:"前半 0-0 / 後半 1-2(24)" },
+            { n:3, o:"バディーSC千葉", t:"official", p:[], g:[], s:[8,0], sc:[17,15,22,20,20,20], r:"W",
+              detail:"前半 6-0(17,15,22,20,20,20) / 後半 2-0" },
+            { n:4, o:"FC市川ガナーズ", t:"official", p:[], g:[], s:[4,0], sc:[24,4,10,22], r:"W",
+              detail:"前半 4-0(24,4,10,22) / 後半 0-0" },
+            { n:5, o:"Wings U12", t:"tm", p:[], g:[], s:[4,10], sc:[4,6,9], r:"L",
+              detail:"前半 3-5(4,6,9) / 後半 1-5" },
+            { n:6, o:"FC市川ガナーズ", t:"tm", p:[], g:[], s:[3,1], sc:[22,28,28], r:"W",
+              detail:"前半 1-0(22) / 後半 2-1(28,28)" }
+        ]
+    },
+    {
+        date: "2025-08-08", title: "TM vs センアーノ神戸", type: "tm",
+        venue: "", weather: "", staff: [],
+        videos: [{ label: "センアーノ神戸TM", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9WTPtN05SOiQ0Smmo5eroVI" }],
+        note: "",
+        games: [
+            { n:1, o:"センアーノ神戸", t:"tm", p:[], g:[], s:[1,0], sc:[], r:"W", detail:"" },
+            { n:2, o:"センアーノ神戸", t:"tm", p:[], g:[], s:[0,5], sc:[], r:"L", detail:"" },
+            { n:3, o:"センアーノ神戸", t:"tm", p:[], g:[], s:[0,4], sc:[], r:"L", detail:"" }
+        ]
+    },
+    {
+        date: "2025-05-10", title: "KIDS POWER CUP", type: "official",
+        venue: "北中運動場", weather: "", staff: [],
+        videos: [{ label: "KIDS POWER CUP", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9UZY2_-z48XifZljPlo1zA6" }],
+        note: "",
+        games: [
+            { n:1, o:"中野島B", t:"official", p:[2,3,4,6,8,9,15,17,18,19,20,22,24,28], g:[9,6], s:[1,2], sc:[8], r:"L",
+              detail:"前半[4,8,17,19,22,24,28]GK9 1-1(8) / 後半[2,3,9,15,17,18,20]GK6 0-1" },
+            { n:2, o:"ES深谷", t:"official", p:[2,3,4,6,8,9,10,14,16,17,19,20,22,24,28], g:[28,9], s:[1,2], sc:[10], r:"L",
+              detail:"前半[3,4,6,8,10,19,20]GK28 1-1(10) / 後半[2,14,16,17,22,24,28]GK9 0-1" },
+            { n:3, o:"KIDS POWER A", t:"official", p:[2,3,4,6,8,9,10,14,15,16,17,18,20,22,24], g:[17,20], s:[1,3], sc:[9], r:"L",
+              detail:"前半[15,20,22,9,4,3,6]GK17 1-0(9) / 後半[2,10,14,16,8,18,24]GK20 0-3" },
+            { n:4, o:"立川九小", t:"official", p:[2,3,4,6,8,9,10,14,15,16,17,18,19,20,22,28], g:[6,3], s:[3,3], sc:[6,2,20], r:"L",
+              detail:"前半[15,19,17,9,14,16,28]GK6 0-3 / 後半[2,20,22,8,4,18,6]GK3 3-0(6,2,20) PK1-3" }
+        ]
+    },
+    {
+        date: "2025-05-25", title: "14ブロック3年生大会", type: "official",
+        venue: "廻田小G", weather: "", staff: [],
+        videos: [{ label: "14B交流戦1次リーグ", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9VZH25_qc5m8E-lkeTf2LC_" }],
+        note: "",
+        games: [
+            { n:1, o:"メスターノ", t:"official", p:[2,4,6,8,13,15,17,22,24], g:[6], s:[0,3], sc:[], r:"L",
+              detail:"前半[2,4,8,13,17,22,24]GK6 0-2 / 後半[2,4,8,13,15,17,22]GK6 0-1" },
+            { n:2, o:"花小金井シューターズ", t:"official", p:[3,6,9,10,14,15,16,17,18,19,28], g:[17], s:[2,1], sc:[9], r:"W",
+              detail:"前半[3,6,9,10→18,16,19,28]GK17 1-1(OG) / 後半[3,6,9,10,14,18,19→15]GK17 1-0(9)" }
+        ]
+    },
+    {
+        date: "2025-06-21", title: "アントラーズ・ノルテFestival", type: "official",
+        venue: "ひたち海浜公園", weather: "", staff: [],
+        videos: [{ label: "ANTLERS NORTE FESTIVAL", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9UUrQeikCiKsedofBm77Ckz" }],
+        note: "",
+        games: [
+            { n:1, o:"水戸ホーリーホック", t:"official", p:[2,3,4,6,8,9,10,14,15,16,17,19,20,22,28], g:[10], s:[9,0], sc:[22,9,19,8,6,8,28,6], r:"W",
+              detail:"前半[3,4,9,16,17,19,22]GK10 3-0(22,9,19) / 後半[2,6,8,14,28,20,15]GK10 6-0(8,OG,6,8,28,6)" },
+            { n:2, o:"カシマスクール選抜", t:"official", p:[3,4,6,8,9,10,13,14,17,18,20,22,24,28], g:[9,6], s:[0,4], sc:[], r:"L",
+              detail:"前半[4,6,10,13,17,18,24]GK9 0-4 / 後半[3,8,9,14,20,22,28]GK6 0-0" },
+            { n:3, o:"なかのFC", t:"official", p:[2,3,6,8,9,10,13,14,15,16,18,19,20,24,28], g:[20,22], s:[6,0], sc:[24,16,19,19,10,6], r:"W",
+              detail:"前半[2,10,13,16,18,19,24]GK20 5-0(24,16,19,19,10) / 後半[3,6,8,9,14,15,28]GK22 1-0(6)" },
+            { n:4, o:"FCリアル", t:"official", p:[2,3,4,6,8,13,15,16,17,18,19,20,22,24,28], g:[18,28], s:[3,3], sc:[20,24,18], r:"D",
+              detail:"前半[4,6,15,16,20,22,24]GK18 2-1(20,24) / 後半[2,3,8,13,17,18,19]GK28 1-2(18)" }
+        ]
+    },
+    {
+        date: "2025-07-12", title: "Torneo estate 2025 Day1", type: "official",
+        venue: "ひたち海浜公園", weather: "", staff: [],
+        videos: [{ label: "torneo estate 2025", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9XPWjHxOz525QlEBbnEG7qr" }],
+        note: "Bグループ3位",
+        games: [
+            { n:1, o:"アントラーズつくば", t:"official", p:[4,6,9,13,17,18,20,22], g:[10], s:[0,4], sc:[], r:"L",
+              detail:"前半[4,6,9,17,18,20,22]GK10 0-1 / 後半[4,6,9,13→17,18,20,22]GK10 0-3" },
+            { n:2, o:"アントラーズノルテ", t:"tm", p:[2,3,6,8,10,13,14,15,16,24], g:[17,6], s:[2,3], sc:[13,13], r:"L",
+              detail:"前半[2,3,8,10,13,14,16]GK17 0-2 / 後半[2,8,10,13,14,15,24]GK6 2-1(13,13)" },
+            { n:3, o:"FOURWINDS", t:"official", p:[3,4,6,8,9,13,15,16,17,18,20,22], g:[13,20], s:[3,2], sc:[13,13,6], r:"W",
+              detail:"前半[3,4,9,16,18,20,22]GK13 0-0 / 後半[6,8,9,13,17,18,22→15]GK20 3-2(13,13,6)" },
+            { n:4, o:"アストロン", t:"official", p:[2,4,6,8,10,14,15,17,18,19,20,24], g:[4,9], s:[4,5], sc:[6,17,24,8], r:"L",
+              detail:"前半[2,6,10,14,15,17,24]GK4 2-2(6,17) / 後半[4,8,10,18,19,20,24]GK9 2-3(24,8)" }
+        ]
+    },
+    {
+        date: "2025-07-13", title: "Torneo estate 2025 Day2", type: "official",
+        venue: "ひたち海浜公園", weather: "", staff: [],
+        videos: [{ label: "torneo estate 2025", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9XPWjHxOz525QlEBbnEG7qr" }],
+        note: "下位トーナメント(1)4位",
+        games: [
+            { n:1, o:"レジスタブルー", t:"official", p:[2,3,6,8,9,16,17,22], g:[6], s:[1,3], sc:[2], r:"L",
+              detail:"前半[2,3,8,9,16,17,22]GK6 1-2(2) / 後半[2,3,8,9,16,17,22]GK6 0-1" },
+            { n:2, o:"Testigo", t:"tm", p:[4,6,10,13,17,18,20,24], g:[17], s:[0,6], sc:[], r:"L",
+              detail:"前半[4,6,10,13,18,20,24]GK17 0-2 / 後半[4,6,10,13,18,20,24]GK17 0-4" },
+            { n:3, o:"デラサル", t:"official", p:[2,3,4,6,8,9,13,14,15,16,17,19,20,22], g:[10,19], s:[3,1], sc:[9,9,15], r:"W",
+              detail:"前半[2,4,9,13,14,15,20]GK10 1-1(9) / 後半[2,3,8,9,14,15,22→6→17→16]GK19 2-0(9,15)" },
+            { n:4, o:"FC COLORS", t:"official", p:[3,4,6,8,10,14,15,16,17,18,20,22,24], g:[13,20], s:[0,2], sc:[], r:"L",
+              detail:"前半[4,8,10,16,17,18,20]GK13 0-1 / 後半[4,6,14,15,17,22,24→10→3]GK20 0-1" }
+        ]
+    },
+    {
+        date: "2025-07-19", title: "小平WS交流戦", type: "tm",
+        venue: "東大和清原グラウンド", weather: "", staff: [],
+        videos: [{ label: "小平WS交流戦", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9WuQuTBXex5qRC21xXC5VdJ" }],
+        note: "",
+        games: [
+            { n:1, o:"FCレガーレ", t:"tm", p:[3,4,8,9,10,13,15,17,22], g:[10,3], s:[0,1], sc:[], r:"L",
+              detail:"前半[4,8,9,13,15,17,22]GK10 0-1 / 後半[4,8,9,10,13→15,17,22]GK3 0-0" },
+            { n:2, o:"平山SC", t:"tm", p:[2,3,10,14,16,17,18,19,20,24], g:[13,17], s:[1,2], sc:[20], r:"L",
+              detail:"前半[2,3,10,16,18,20,24]GK13 0-0 / 後半[2,3,14,16,18,19,20]GK17 1-2(20)" },
+            { n:3, o:"西国分寺", t:"tm", p:[2,4,6,8,13,14,15,16,18,19,20,24], g:[9,20], s:[14,0], sc:[24,24,13,24,13,24,13,13,6,14,6,13,6,4], r:"W",
+              detail:"前半[4,8,15,13,24,6,18]GK9 8-0(24,24,13,24,13,24,13,13) / 後半[2,4,6,13,14,16,19]GK20 6-0(6,14,6,13,6,4)" },
+            { n:4, o:"小平WS", t:"tm", p:[3,4,6,9,10,14,17,20,22,24], g:[13,6], s:[3,1], sc:[10,22,17], r:"W",
+              detail:"前半[3,6,9,10,17,20,22]GK13 1-1(10) / 後半[3,4,9,10→24,17,20→14,22]GK6 2-0(22,17)" },
+            { n:5, o:"Grant", t:"tm", p:[2,4,6,8,10,14,15,16,17,18,19,20,22,24], g:[9,3], s:[1,4], sc:[6], r:"L",
+              detail:"前半[2,6,8,14,18,19,20]GK9 1-2(6) / 後半[4,10,15,16,17,22,24]GK3 0-2" },
+            { n:6, o:"Grant", t:"tm", p:[3,8,9,13,17,18,19,20], g:[18], s:[1,1], sc:[9], r:"D",
+              detail:"[3,8,9,13,17,19,20]GK18" }
+        ]
+    },
+    {
+        date: "2025-07-21", title: "上尾TM", type: "tm",
+        venue: "上尾市平塚サッカー場人工芝G", weather: "", staff: [],
+        videos: [{ label: "上尾TM", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9WeFOnFv5_L7-dcW8ySkvTE" }],
+        note: "",
+        games: [
+            { n:1, o:"上尾朝日", t:"tm", p:[3,4,6,8,9,10,13,14,15,16,17,18,19,20,22,24], g:[20,10], s:[9,0], sc:[9,9,8,9,17,13,15,19,20], r:"W",
+              detail:"前半[4,8,9,13,14,17,18]GK20 6-0(9,9,8,9,17,13) / 後半[3,6,15→22,16,19,20,24]GK10 3-0(15,19,20)" },
+            { n:2, o:"キッズパワー", t:"tm", p:[2,3,4,6,8,9,10,13,14,15,17,18,19,20,22], g:[6,17], s:[4,2], sc:[22,20,19,13], r:"W",
+              detail:"前半[2,3,9,10,15,17,22]GK6 1-1(22) / 後半[4,8,13,14,18,19,20]GK17 3-1(20,19,13)" },
+            { n:3, o:"上尾朝日", t:"tm", p:[2,3,6,9,10,13,14,15,16,17,19,20,22,24], g:[17,3], s:[4,1], sc:[9,24,17,17], r:"W",
+              detail:"前半[2,3,6,9,10,15,24]GK17 2-1(9,24) / 後半[13,14,16,17,19,20,22]GK3 2-0(17,17)" },
+            { n:4, o:"キッズパワー", t:"tm", p:[2,3,4,6,8,10,13,14,15,16,18,19,20,22,24], g:[13,9], s:[1,2], sc:[20], r:"L",
+              detail:"前半[2,3,4,8,15,18,24]GK13 0-2 / 後半[6,13→10,14,16,18→19,20,22]GK9 1-0(20)" },
+            { n:5, o:"上尾朝日", t:"tm", p:[2,3,4,6,8,9,13,14,15,16,17,18,20,22,24], g:[10,6], s:[0,2], sc:[], r:"L",
+              detail:"前半[4,8,9,17,18,20,22]→後半[2,3,13,14,15,16,24] GK10→GK6" }
+        ]
+    },
+    {
+        date: "2025-08-09", title: "SPOG CUP U9 Day1", type: "official",
+        venue: "FC COLORZ グラウンド", weather: "", staff: [],
+        videos: [{ label: "SPOG CUP U9", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9UndRv_ZT9f_9U9F1P7UHR4" }],
+        note: "",
+        games: [
+            { n:1, o:"フォルツァ松本", t:"official", p:[2,8,13,14,15,16,19,24], g:[19], s:[5,1], sc:[24,8,13,16,13], r:"W",
+              detail:"[2,8,13,14,15,16,24]GK19" },
+            { n:2, o:"カラーズ", t:"official", p:[2,3,8,13,15,16,19,24], g:[16], s:[0,4], sc:[], r:"L",
+              detail:"[2,3,8,13,15,19,24]GK16" },
+            { n:3, o:"コラソン", t:"official", p:[2,3,8,13,14,15,16,19,24], g:[19,3], s:[0,7], sc:[], r:"L",
+              detail:"[2,3,8,13,14,15,24]GK19→[2,8,13,15,16,19,24]GK3" },
+            { n:4, o:"大泉学園", t:"official", p:[2,3,8,13,14,15,16,19,24], g:[14,15], s:[0,12], sc:[], r:"L",
+              detail:"[2,3,8,13,15,19,24]GK14→[2,8,13,14,16,19,24]GK15" },
+            { n:5, o:"オオタFC", t:"official", p:[2,3,8,14,15,16,19,24], g:[24], s:[0,2], sc:[], r:"L",
+              detail:"[2,3,8,14,15,16,19]GK24" }
+        ]
+    },
+    {
+        date: "2025-08-10", title: "SPOG CUP U9 Day2", type: "official",
+        venue: "筑波学園大学Tフィールド", weather: "", staff: [],
+        videos: [{ label: "SPOG CUP U9", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9UndRv_ZT9f_9U9F1P7UHR4" }],
+        note: "チームMVP: #2優聖",
+        games: [
+            { n:1, o:"ドラゴンズ柏", t:"official", p:[2,8,13,14,15,16,19,24], g:[3], s:[1,3], sc:[8], r:"L",
+              detail:"[2,8,13,15,16→14,19,24]GK3" },
+            { n:2, o:"GRANT", t:"official", p:[2,3,8,13,14,15,16,24], g:[19], s:[0,7], sc:[], r:"L",
+              detail:"[2,3,8,13,14,15→16,24]GK19" },
+            { n:3, o:"フォルツァ松本", t:"official", p:[2,3,8,13,14,15,16,19,24], g:[13], s:[4,0], sc:[2,2,24,15], r:"W",
+              detail:"[2,3,8→16,14,15,19,24]GK13" },
+            { n:4, o:"レジスタ", t:"official", p:[2,8,13,14,15,16,19,24], g:[3], s:[0,11], sc:[], r:"L",
+              detail:"[2,8,13,14→24,15,16,19]GK3" },
+            { n:5, o:"パレイストラ", t:"official", p:[2,3,8,13,14,15,16,19,24], g:[8,13], s:[0,0], sc:[], r:"D",
+              detail:"[2,3,13→8,14,15→19→15→19,16,24→19]GK8→GK13" }
+        ]
+    },
+    {
+        date: "2025-08-30", title: "江南南TM", type: "tm",
+        venue: "JACPA狭山総合グラウンド", weather: "", staff: [],
+        videos: [{ label: "TM（江南南）", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9XUhWVJ9h2HSPr1z5OVsay2" }],
+        note: "",
+        games: [
+            { n:1, o:"江南南", t:"tm", p:[2,5,9,10,11,17,22,23,65], g:[10], s:[0,0], sc:[], r:"D", detail:"[5,9,11,17,22,23,65→2]GK10" },
+            { n:2, o:"江南南", t:"tm", p:[2,6,8,10,14,15,18,24], g:[6], s:[2,0], sc:[10,14], r:"W", detail:"[2,8,10,14,15,18,24]GK6" },
+            { n:3, o:"江南南", t:"tm", p:[3,4,5,9,17,20,22,23], g:[20], s:[1,0], sc:[3], r:"W", detail:"[3,4,5,9,17,22,23]GK20" },
+            { n:4, o:"江南南", t:"tm", p:[2,3,8,10,16,18,24,28], g:[3], s:[0,0], sc:[], r:"D", detail:"[2,8,10,16,18,24,28]GK3" },
+            { n:5, o:"江南南", t:"tm", p:[4,5,9,17,20,22,23,65], g:[9], s:[0,2], sc:[], r:"L", detail:"[4,5,17,20,22,23,65]GK9" },
+            { n:6, o:"江南南", t:"tm", p:[2,3,8,14,15,16,28,65], g:[65], s:[0,1], sc:[], r:"L", detail:"[2,3,8,14,15,16,28]GK65" },
+            { n:7, o:"江南南", t:"tm", p:[5,6,9,11,17,20,23], g:[10], s:[0,0], sc:[], r:"D", detail:"[5,6,9,11,17,20,23]GK10" },
+            { n:8, o:"江南南", t:"tm", p:[10,14,15,16,17,18,24,28], g:[17], s:[2,0], sc:[28,10], r:"W", detail:"[10,14,15,16,18,24,28]GK17" }
+        ]
+    },
+    {
+        date: "2025-09-06", title: "レジスタカップ Day1", type: "official",
+        venue: "鹿島ハイツ", weather: "", staff: [],
+        videos: [{ label: "レジスタカップ2025", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9VPNB80WVK6a0zIKnKhLjFY" }],
+        note: "",
+        games: [
+            { n:1, o:"GrantB", t:"official", p:[2,4,5,6,9,11,17,20,22,23,65], g:[20,5], s:[3,0], sc:[11,11,23], r:"W",
+              detail:"前半[4,6,11,17,22,23,65]GK20 2-0(11,11) / 後半[2,4,9,17,20,22,23]GK5 1-0(23)" },
+            { n:2, o:"足柄", t:"official", p:[4,5,9,11,17,20,22,23,65], g:[11], s:[1,3], sc:[9], r:"L",
+              detail:"前半[5,9→4,17,20,22,23,65]GK11 1-2(9) / 後半同メンバー 0-1" },
+            { n:3, o:"ディアブロッサ高田A", t:"official", p:[2,4,5,11,17,20,23,65], g:[4], s:[0,3], sc:[], r:"L",
+              detail:"前半[2,5,11,17,20,23,65]GK4 0-1 / 後半 0-2" },
+            { n:4, o:"GLOW", t:"tm", p:[5,9,17,22,23], g:[], s:[4,4], sc:[9,22,23,17], r:"D",
+              detail:"前半 1-1(9) / 後半 3-3(22,23,17)" },
+            { n:5, o:"大泉学園シルバー", t:"tm", p:[5,9,23,65], g:[], s:[5,2], sc:[5,23,5,65,9], r:"W",
+              detail:"前半 4-1(5,23,5,65) / 後半 1-1(9)" }
+        ]
+    },
+    {
+        date: "2025-09-07", title: "レジスタカップ Day2", type: "official",
+        venue: "鹿島ハイツ", weather: "", staff: [],
+        videos: [{ label: "レジスタカップ2025", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9VPNB80WVK6a0zIKnKhLjFY" }],
+        note: "20位",
+        games: [
+            { n:1, o:"鹿島アントラーズノルテJr", t:"official", p:[2,4,5,6,9,11,17,20,22,23,65], g:[4,17], s:[5,0], sc:[23,2,23,23,9], r:"W",
+              detail:"前半[2,5,11,17,20,22,23]GK4 2-0(23,2) / 後半[4,5,6,9,11,23,65]GK17 3-0(23,23,9)" },
+            { n:2, o:"柏レイソルTOR", t:"official", p:[2,4,5,6,9,11,17,20,22,23,65], g:[20,11], s:[3,3], sc:[11,65,65], r:"W",
+              detail:"前半[2,4,5,11,17,23,65]GK20 2-2(11,65) / 後半[2,5,6,9,20,23,65]GK11 1-1(65) PK3-1" },
+            { n:3, o:"ファナティコス", t:"official", p:[2,4,5,6,9,11,17,20,22,23,65], g:[9,4], s:[1,4], sc:[5], r:"L",
+              detail:"前半[5,6,17,20,22,23,65]GK9 1-3(5) / 後半[2,5,11,17,20,23,65]GK4 0-1" },
+            { n:4, o:"FC GLAUNA", t:"official", p:[2,4,5,6,9,11,17,20,22,23,65], g:[6,17], s:[1,2], sc:[20], r:"L",
+              detail:"前半[4,5,6,11,17,22,65]GK6 0-2 / 後半[2,5,6,9,20,23,65]GK17 1-0(20)" }
+        ]
+    },
+    {
+        date: "2025-10-12", title: "三笠山カップ U9 Day1", type: "official",
+        venue: "三笠山はまなすグランド", weather: "", staff: [],
+        videos: [{ label: "三笠山カップ", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9WR_cxvKfDGXs9WQl73o5TS" }],
+        note: "",
+        games: [
+            { n:1, o:"愛徳", t:"official", p:[3,6,8,10,15,16,18,19,24,28], g:[28,24], s:[3,4], sc:[8,6,6], r:"L",
+              detail:"前半[3,6,8,10,15,16,24]GK28 0-2 / 後半[3,6,8,10,15,18,19]GK24 3-2(8,6,6)" },
+            { n:2, o:"1FC_A", t:"official", p:[3,6,8,10,15,16,18,19,24,28], g:[3,18], s:[0,7], sc:[], r:"L",
+              detail:"前半[6,8,10,16,18,19,28]GK3 0-6 / 後半[3,6,8,15,16,19,24]GK18 0-1" },
+            { n:3, o:"町田JFC_B", t:"official", p:[3,6,8,10,15,16,18,19,28], g:[10,6], s:[1,0], sc:[18], r:"W",
+              detail:"前半[3,6,8,16,18,19,28]GK10 1-0(18) / 後半[3,8,15,16,18,19,28]GK6 0-0" },
+            { n:4, o:"町田JFC_B", t:"tm", p:[3,6,10,16,18,19,24,28], g:[6], s:[0,1], sc:[], r:"L",
+              detail:"[3,10,16,18,19,24,28]GK6" },
+            { n:5, o:"久喜東", t:"tm", p:[6,8,10,15,16,19,24,28], g:[28], s:[5,0], sc:[6,10,8,8,6], r:"W",
+              detail:"[6,8,10,15,16,19,24]GK28" },
+            { n:6, o:"1FC", t:"tm", p:[3,8,10,15,18,19,24,28], g:[6], s:[3,0], sc:[28,10,10], r:"W",
+              detail:"[3,8,10,18,19,24,28]GK6 19→15" }
+        ]
+    },
+    {
+        date: "2025-10-13", title: "三笠山カップ U9 Day2", type: "official",
+        venue: "三笠山はまなすグランド", weather: "", staff: [],
+        videos: [{ label: "三笠山カップ", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9WR_cxvKfDGXs9WQl73o5TS" }],
+        note: "",
+        games: [
+            { n:1, o:"久喜東", t:"official", p:[3,6,8,10,14,15,16,18,19,24,28], g:[8,6], s:[3,3], sc:[18,28,10], r:"D",
+              detail:"前半[3,6,10,18,19,24,28]GK8 2-2(18,28) / 後半[3,8,10,14,15,16,19]GK6 1-1(10)" },
+            { n:2, o:"1FC_B", t:"official", p:[3,6,8,10,14,15,16,18,19,24,28], g:[10,3], s:[4,2], sc:[28,15,28,8], r:"W",
+              detail:"前半[3,6,8,14,15,24,28]GK10 3-0(28,15,28) / 後半[8,10,14,15,16,18,19→24]GK3 1-2(8)" },
+            { n:3, o:"町田JFC_A", t:"official", p:[3,6,8,10,15,16,18,24,28], g:[6,28], s:[0,4], sc:[], r:"L",
+              detail:"前半[3,8,10,15,18,24,28]GK6 0-2 / 後半[3,6,8,10,15,16,24]GK28 0-2" },
+            { n:4, o:"久喜東", t:"tm", p:[3,8,10,14,18,19,24,28], g:[18], s:[2,3], sc:[24,8], r:"L",
+              detail:"[3,8,10,14,19,24,28]GK18" },
+            { n:5, o:"町田JFC", t:"tm", p:[3,10,14,15,16,18,24,28], g:[28], s:[0,3], sc:[], r:"L",
+              detail:"[3,14,10,16,15,24,18]GK28" },
+            { n:6, o:"1FC", t:"tm", p:[6,8,10,15,16,18,19,24,28], g:[3], s:[0,2], sc:[], r:"L",
+              detail:"[6,8,10,15,19,24,28]GK3 24→16,15→18" }
+        ]
+    },
+    {
+        date: "2025-10-18", title: "小平WS交流戦", type: "tm",
+        venue: "小川西グランド", weather: "", staff: [],
+        videos: [{ label: "小平WS交流戦", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9XEd6M0S3zdAENM0HMq6xGn" }],
+        note: "",
+        games: [
+            { n:1, o:"小平WS-T", t:"tm", p:[3,8,10,11,14,15,16,17,18,19,20,24,28,65], g:[10,20], s:[0,1], sc:[], r:"L",
+              detail:"前半[3,8,11,15,17,20,65]GK10 0-0 / 後半[10,14,16,18,19,24,28]GK20 0-1" },
+            { n:2, o:"調布イーグルス", t:"tm", p:[3,4,6,9,10,11,14,15,16,17,18,20,22,24,65], g:[65,17], s:[2,0], sc:[16,20], r:"W",
+              detail:"前半[3,4,6,9,15,18,22]GK65 0-0 / 後半[10,11,14,16,20,24,65]GK17 2-0(16,20)" },
+            { n:3, o:"小平WS-T", t:"tm", p:[4,6,9,17,19,20,22,28], g:[20], s:[1,1], sc:[9], r:"D",
+              detail:"[4,6,9,17,19,22,28]GK20" },
+            { n:4, o:"国立SSS", t:"tm", p:[3,8,9,10,14,15,16,18,19,28], g:[9], s:[2,1], sc:[8,18], r:"W",
+              detail:"[3,8,10,14,16,18,19]GK9 14,16→15,28" },
+            { n:5, o:"小平WS-T", t:"tm", p:[4,6,9,11,17,20,22,24,65], g:[3], s:[0,1], sc:[], r:"L",
+              detail:"[6,4,11,17,20,22,65]GK3 6,17→9,24" }
+        ]
+    },
+    {
+        date: "2025-11-02", title: "TOMAS 14B 1次予選", type: "official",
+        venue: "ブリヂストン南グランド", weather: "", staff: [],
+        videos: [{ label: "TOMAS 14B 1次予選", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9VWyywGWvkAuwXDTwof4u8n" }],
+        note: "10組1位通過",
+        games: [
+            { n:1, o:"小平ウェスト", t:"official", p:[3,4,8,11,17,20,22,65], g:[4], s:[1,0], sc:[65], r:"W",
+              detail:"前半[3,8,11,17,20,22,65]GK4 0-0 / 後半[3,8,11,17,20,22,65]GK4 1-0(65)" },
+            { n:2, o:"FC.Waragoma", t:"official", p:[2,4,6,9,10,17,19,28], g:[17], s:[7,0], sc:[2,9,28,9,10,28], r:"W",
+              detail:"前半[2,4,6,9,10,19,28]GK17 1-0(2FK) / 後半[2,4,6,9,10,19,28]GK17 6-0(9,OG,28,9,10,28)" },
+            { n:3, o:"秋津SC", t:"official", p:[8,9,11,14,15,16,18,22,24,28], g:[11], s:[17,0], sc:[8,18,14,8,18,8,18,18,22,8,9,9,9,28,9,28,9], r:"W",
+              detail:"前半[8,14,15,16,18,22,24]GK11 10-0(8,18,14,8,18,8,18,18,22,8) / 後半[8,9,14,15,16,18,28]GK11 7-0(9,9,9,28,9,28,9)" },
+            { n:4, o:"小平ウェスト", t:"tm", p:[2,3,4,6,9,10,11,16,17,19,20,24,28,65], g:[65,20], s:[1,2], sc:[65], r:"L",
+              detail:"前半[2,3,4,10,17,19,20]GK65 0-2 / 後半[6,9,11,16,24,28,65]GK20 1-0(65)" }
+        ]
+    },
+    {
+        date: "2025-11-08", title: "TOMAS 14B 2次予選", type: "official",
+        venue: "東村山市立八坂小学校", weather: "", staff: [],
+        videos: [{ label: "TOMAS 14B 2次予選", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9XjPpsg2u40-UUyTIw-AQbF" }],
+        note: "",
+        games: [
+            { n:1, o:"サンデーFC", t:"official", p:[2,3,4,6,8,9,10,11,14,15,16,17,18,19,20,24,28,65], g:[6], s:[6,0], sc:[2,14,65,65,65,10], r:"W",
+              detail:"前半[2,4,8,14,15,17,65]GK6 4-0(2,14,65,65) / 後半[3,4→24,9→28,11,16→20,18→19,65→10]GK6 2-0(65,10)" }
+        ]
+    },
+    {
+        date: "2025-11-23", title: "TOMAS 14B 決勝トーナメント", type: "official",
+        venue: "小平中央公園", weather: "", staff: [],
+        videos: [{ label: "TOMAS 決勝リーグ", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9Ul8ZB8O2X-oFbSqoFHSgyN" }],
+        note: "",
+        games: [
+            { n:1, o:"東大和4FC", t:"official", p:[3,4,6,9,10,14,15,18,19,24,28], g:[17], s:[2,1], sc:[24], r:"W",
+              detail:"前半[3,4,6,9,19,24,28]GK17 2-0(24,OG) / 後半[3,4→10,6→14,9→15,19→18,24,28]GK17 0-1" },
+            { n:2, o:"FCメスターノ", t:"official", p:[2,4,8,11,16,17,20,22,65], g:[4], s:[4,0], sc:[11,11,8,65], r:"W",
+              detail:"前半[2,8,11,17,20,22,65]GK4 2-0(11,11PK) / 後半[2,8→16,11,17→8,20,22,65]GK4 2-0(8,65)" }
+        ]
+    },
+    {
+        date: "2025-11-24", title: "TM vs オーパスワン", type: "tm",
+        venue: "足立区加平小学校", weather: "", staff: [],
+        videos: [{ label: "TM（オーパスワン）", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9UUjhY-vYHUfxRN5kkl91pm" }],
+        note: "",
+        games: [
+            { n:1, o:"オーパスワン", t:"tm", p:[4,9,10,14,15,16,17,18], g:[9], s:[0,1], sc:[], r:"L", detail:"[4,10,14,15,16,17,18]GK9" },
+            { n:2, o:"オーパスワン", t:"tm", p:[2,3,6,9,17,19,28,65], g:[17], s:[2,0], sc:[9,65], r:"W", detail:"[2,3,6,9,19,28,65]GK17" },
+            { n:3, o:"オーパスワン", t:"tm", p:[4,8,10,11,15,16,22,24], g:[10], s:[2,1], sc:[8,16], r:"W", detail:"[4,8,11,15,16,22,24]GK10" },
+            { n:4, o:"オーパスワン", t:"tm", p:[3,9,10,14,17,18,19], g:[65], s:[5,0], sc:[17,17,17,10,17], r:"W", detail:"[3,9,10,14,17,18,19]GK65" },
+            { n:5, o:"オーパスワン", t:"tm", p:[2,6,8,11,22,24,28,65], g:[6], s:[0,0], sc:[], r:"D", detail:"[2,8,11,22,24,28,65]GK6" },
+            { n:6, o:"オーパスワン", t:"tm", p:[3,4,10,15,16,22,24,28], g:[28], s:[4,1], sc:[16,10,15], r:"W", detail:"[3,4,10,15,16,22,24]GK28" }
+        ]
+    },
+    {
+        date: "2026-03-01", title: "全国少年サッカー交流大会 in 茨城 Day2", type: "official",
+        venue: "ジャーニー土合G", weather: "", staff: [],
+        videos: [{ label: "2日目", url: "https://www.youtube.com/playlist?list=PL-R_0FllPevNGUt7BHcOzJRoJDQLVayBf" }],
+        note: "",
+        games: [
+            { n:1, o:"リバティーFC", t:"official", p:[2,3,4,8,9,10,11,15,17,20,22,65], g:[10,11], s:[0,0], sc:[], r:"W",
+              detail:"前半[2,4,11,17,20,22,65]GK10 0-0 / 後半[3,4,8,9,20,22,65]GK11 0-0 PK7-6" },
+            { n:2, o:"JFCアミスタ市貝", t:"official", p:[2,3,6,8,9,10,11,14,15,16,17,18,19,20,28], g:[10,20], s:[0,5], sc:[], r:"L",
+              detail:"前半[6,14,15,16,18,19,28]GK10 0-5 / 後半[2,3,8,9,10,11,17]GK20 0-0" },
+            { n:3, o:"XFC", t:"official", p:[3,4,6,8,9,10,11,14,16,17,18,20,22,65], g:[9,17], s:[2,0], sc:[20,8], r:"W",
+              detail:"前半[4,6,16,17,20,22,65]GK9 1-0(20) / 後半[3,8,9,10,11,14,18]GK17 1-0(8)" },
+            { n:4, o:"messe宮城", t:"official", p:[2,4,10,14,15,16,17,18,19,20,22,28,65], g:[65,11], s:[1,2], sc:[2], r:"L",
+              detail:"前半[10,14,15,16,18,19,28]GK65 0-2 / 後半[2,4,15,19,20→22,28→6,65→17]GK11 1-0(2)" }
+        ]
+    },
+    {
+        date: "2026-03-07", title: "トリアネーロTM", type: "tm",
+        venue: "鶴間公園スポーツエリア", weather: "", staff: [],
+        videos: [{ label: "トリアネーロTM", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9W0JQtIFFQsKLrgCPSf0iQ_" }],
+        note: "",
+        games: [
+            { n:1, o:"トリアネーロ", t:"tm", p:[2,4,8,11,17,20,22,65], g:[17], s:[0,1], sc:[], r:"L", detail:"[2,4,8,11,20,22,65]GK17" },
+            { n:2, o:"トリアネーロ", t:"tm", p:[2,4,8,17,22,24,28,65], g:[4], s:[1,2], sc:[65], r:"L", detail:"[2,8,17,22,24,28,65]GK4" },
+            { n:3, o:"トリアネーロ", t:"tm", p:[4,11,17,20,22,24,28,65], g:[28], s:[0,2], sc:[], r:"L", detail:"[4,11,17,20,22,24,65]GK28" },
+            { n:4, o:"トリアネーロ", t:"tm", p:[2,4,8,11,20,22,65], g:[24], s:[0,3], sc:[], r:"L", detail:"[2,4,8,11,20,22,65]GK24" },
+            { n:5, o:"トリアネーロ", t:"tm", p:[2,4,8,11,17,20,24,28], g:[8], s:[0,1], sc:[], r:"L", detail:"[2,4,11,17,20,24,28]GK8" }
+        ]
+    },
+    {
+        date: "2026-01-12", title: "TOMAS 14B決勝 + TM", type: "mixed",
+        venue: "", weather: "", staff: [],
+        videos: [{ label: "TOMAS決勝＋TM", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9X6IGa9kAdnnEUrGYx4KD_M" }],
+        note: "準優勝",
+        games: [
+            { n:1, o:"OXALA TOKYO", t:"official", p:[2,4,6,8,9,11,17,20,22,65], g:[4], s:[0,2], sc:[], r:"L",
+              detail:"前半[2,6,8,11,17,20,65]GK4 0-2 / 後半[9,8,11,17,20,22,65]GK4 0-0" },
+            { n:2, o:"メスターノ", t:"tm", p:[3,9,10,14,16,18,19,24], g:[9], s:[2,0], sc:[19,19], r:"W",
+              detail:"[3,10,14,16,18,19,24]GK9" },
+            { n:3, o:"アベリア", t:"tm", p:[3,10,14,15,19,20,24,28], g:[20], s:[0,1], sc:[], r:"L",
+              detail:"[3,10,14,15,19,24,28]GK20" },
+            { n:4, o:"鷹の台ファイターズ", t:"tm", p:[4,6,9,15,16,17,18,28], g:[17], s:[2,1], sc:[18,15], r:"W",
+              detail:"[4,6,9,15,16,18,28]GK17" }
+        ]
+    },
+    {
+        date: "2026-01-24", title: "ANTLERS NEW GENERATION CUP Day1", type: "official",
+        venue: "ジャーニー若松G", weather: "", staff: [],
+        videos: [{ label: "ANTLERS NEW GENERATION CUP", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9WBocryxMcyHTMcxF5ddUad" }],
+        note: "グループC 1位通過",
+        games: [
+            { n:1, o:"鹿島アントラーズノルテ", t:"official", p:[2,3,4,6,8,10,11,16,17,18,20,22,24,28,65], g:[28,65], s:[2,1], sc:[22,22], r:"W",
+              detail:"前半[2,3,4,11,18,20,22]GK28 2-0(22,22) / 後半[6,8,10,16,17,24,28]GK65 0-1" },
+            { n:2, o:"FCリアル", t:"official", p:[2,3,4,9,10,14,15,17,19,20,22,24,65], g:[17,11], s:[1,0], sc:[10], r:"W",
+              detail:"前半[4,9,10,14,15,19,65]GK17 1-0(10) / 後半[2,3,17,20,22,24,65]GK11 0-0" },
+            { n:3, o:"戸塚FCJ", t:"official", p:[2,4,6,8,9,11,14,15,16,18,19,20,28,65], g:[4,20], s:[4,0], sc:[9,9,8,28], r:"W",
+              detail:"前半[6,8,9,11,14,15,19]GK4 1-0(9) / 後半[4,8,2,16,18,28,65]GK20 3-0(9,8,28)" },
+            { n:4, o:"印西FC", t:"official", p:[6,9,10,14,15,17,19,20,24], g:[9,65], s:[4,1], sc:[20,6,9,9], r:"W",
+              detail:"前半[6,10,14,15,17,20,24]GK9 1-0(20) / 後半[6,9,10,14,17,19,24]GK65 3-1(6,9,9)" },
+            { n:5, o:"OXALA TOKYO", t:"tm", p:[3,4,8,9,11,20,22,65], g:[10], s:[0,0], sc:[], r:"D",
+              detail:"FM [3,4,8,11,20→9,22,65]GK10" },
+            { n:6, o:"ESFORCO FC", t:"tm", p:[2,14,15,16,17,18,19,24,28], g:[6], s:[0,2], sc:[], r:"L",
+              detail:"FM [2,15,17,18→14,19,24,28→16]GK6" }
+        ]
+    },
+    {
+        date: "2026-01-25", title: "ANTLERS NEW GENERATION CUP Day2", type: "official",
+        venue: "ジャーニー若松G", weather: "晴・強風", staff: [],
+        videos: [{ label: "ANTLERS NEW GENERATION CUP", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9WBocryxMcyHTMcxF5ddUad" }],
+        note: "最終順位 5位 / 優秀賞: 一翔",
+        games: [
+            { n:1, o:"プライド", t:"official", p:[2,3,4,8,9,11,14,15,17,20,22,24,28,65], g:[10,6], s:[0,8], sc:[], r:"L",
+              detail:"前半[4,8,9,11,15,22,28]GK10 0-6 / 後半[2,3,14,17,20,24,65]GK6 0-2" },
+            { n:2, o:"TD FC", t:"official", p:[3,4,6,8,9,10,11,16,17,18,19,20,22,65], g:[11,17], s:[0,1], sc:[], r:"L",
+              detail:"前半[3,6,17,18,19,20,65]GK11 0-1 / 後半[4,8,9,10,11,16,22]GK17 0-0" },
+            { n:3, o:"MITA", t:"official", p:[2,3,4,6,8,9,10,11,16,17,18,20,24,28,65], g:[65,19], s:[0,6], sc:[], r:"L",
+              detail:"前半[2,4,8,9,11,16,24]GK65 0-2 / 後半[3,6,10,17,18,20,28]GK19 0-4" },
+            { n:4, o:"ESFORCO", t:"official", p:[4,6,8,14,15,16,18,19,20,22,24,65], g:[3,4], s:[0,3], sc:[], r:"L",
+              detail:"前半[6,8,14,16,19,22,24]GK3 0-2 / 後半[14,15,18,19,20,22,65]GK4 0-1" }
+        ]
+    },
+    {
+        date: "2026-02-07", title: "TM vs SCH", type: "tm",
+        venue: "狭山G", weather: "", staff: [],
+        videos: [{ label: "TM（SCH）", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9WrHW3k7jxccmFMGgRsLKwO" }],
+        note: "",
+        games: [
+            { n:1, o:"SCH", t:"tm", p:[2,3,8,17,24,28,65], g:[6], s:[1,2], sc:[65], r:"L", detail:"[2,3,8,17,24,28,65]GK6" },
+            { n:2, o:"SCH", t:"tm", p:[6,10,14,15,16,18,19], g:[4], s:[0,3], sc:[], r:"L", detail:"[6,10,14,15,16,18,19]GK4" },
+            { n:3, o:"SCH", t:"tm", p:[2,4,8,11,17,22,65], g:[10], s:[1,1], sc:[11], r:"D", detail:"[2,4,8,11,17,22,65]GK10" },
+            { n:4, o:"SCH", t:"tm", p:[3,6,10,14,16,24,28], g:[11], s:[0,2], sc:[], r:"L", detail:"[3,6,10,14,16,24,28]GK11" },
+            { n:5, o:"SCH", t:"tm", p:[4,11,15,17,18,19,22], g:[3], s:[1,2], sc:[], r:"L", detail:"[4,11,15,17,18,19,22]GK3" },
+            { n:6, o:"SCH", t:"tm", p:[2,3,8,10,24,28,65], g:[17], s:[3,2], sc:[28,28,28], r:"W", detail:"[2,3,8,10,24,28,65]GK17" },
+            { n:7, o:"SCH", t:"tm", p:[4,6,14,15,16,17,19], g:[65], s:[0,6], sc:[], r:"L", detail:"[4,6,14,15,16,17,19]GK65" },
+            { n:8, o:"SCH", t:"tm", p:[2,11,18,22,24,28,65], g:[10], s:[1,1], sc:[11], r:"D", detail:"[2,11,18,22,24,28,65]GK10" },
+            { n:9, o:"SCH", t:"tm", p:[3,4,8,10,14,15,18], g:[11], s:[2,3], sc:[18,10], r:"L", detail:"[3,4,8,10,14,15,18]GK11" }
+        ]
+    },
+    {
+        date: "2026-02-14", title: "TM vs エクセレントフィート", type: "tm",
+        venue: "SFAフットボールセンター", weather: "", staff: [],
+        videos: [],
+        note: "15分×1本",
+        games: [
+            { n:1, o:"エクセレントフィート", t:"tm", p:[2,4,8,9,11,19,22,65], g:[3], s:[1,4], sc:[2], r:"L", detail:"[2,4,8,9,11,22→19,65]GK3" },
+            { n:2, o:"エクセレントフィート", t:"tm", p:[3,14,16,19,20,22,28], g:[9], s:[0,5], sc:[], r:"L", detail:"[3,14,16,19,20,22,28]GK9" },
+            { n:3, o:"エクセレントフィート", t:"tm", p:[2,3,4,9,11,20,65], g:[8], s:[0,1], sc:[], r:"L", detail:"[2,3,4,9,11,20,65]GK8" },
+            { n:4, o:"エクセレントフィート", t:"tm", p:[8,14,16,19,22,24,28], g:[20], s:[0,2], sc:[], r:"L", detail:"[8,14,16,19,22,24,28]GK20" },
+            { n:5, o:"エクセレントフィート", t:"tm", p:[2,4,9,11,20,22,65], g:[19], s:[0,1], sc:[], r:"L", detail:"[2,4,9,11,20,22,65]GK19" },
+            { n:6, o:"エクセレントフィート", t:"tm", p:[3,10,14,16,18,24,28], g:[11], s:[0,4], sc:[], r:"L", detail:"[3,10,14,16,18,24,28]GK11" },
+            { n:7, o:"エクセレントフィート", t:"tm", p:[2,4,10,11,19,20,22], g:[24], s:[1,0], sc:[20], r:"W", detail:"[2,4,10,11,19,20,22]GK24" },
+            { n:8, o:"エクセレントフィート", t:"tm", p:[3,8,9,14,18,24,28], g:[4], s:[1,2], sc:[9], r:"L", detail:"[3,8,9,14,18,24,28]GK4" },
+            { n:9, o:"エクセレントフィート", t:"tm", p:[2,4,8,9,10,11,14,16,18,19,20,22,24,28], g:[3], s:[1,4], sc:[9], r:"L",
+              detail:"前半[2,4,9,10,11,20,22]→後半[8,14,16,18,19,24,28] GK3" }
+        ]
+    },
+    {
+        date: "2026-02-23", title: "TM @東松山", type: "tm",
+        venue: "東松山リバーサイドパーク（土グランド）", weather: "", staff: [],
+        videos: [{ label: "TM@東松山", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9XnDNOWzariyXAqJxE-2CrJ" }],
+        note: "",
+        games: [
+            { n:1, o:"東松山ペレーニャ", t:"tm", p:[2,3,4,6,8,10,11,14,15,17,20,22,24,65], g:[28,18], s:[1,0], sc:[2], r:"W",
+              detail:"前半[3,8,11,17,20,22,65]GK28 0-0 / 後半[2,4,6,10,14,15,24]GK18 1-0(2)" },
+            { n:2, o:"バディーSC", t:"tm", p:[2,3,4,6,8,10,11,14,15,17,18,20,22,24,28,65], g:[4,6], s:[0,3], sc:[], r:"L",
+              detail:"前半[3,11,18,20,22,28,65]GK4 0-1 / 後半[2,8,10,14,15,17,24]GK6 0-2" },
+            { n:3, o:"東松山ペレーニャ", t:"tm", p:[2,3,4,6,8,10,11,14,15,17,18,20,22,24,28,65], g:[6,3], s:[1,0], sc:[17], r:"W",
+              detail:"前半[2,8,10,14,15,17,24]GK6 1-0(17) / 後半[4,11,18,20,22,28,65]GK3 0-0" },
+            { n:4, o:"バディーSC", t:"tm", p:[2,3,4,6,8,10,11,14,15,17,18,20,22,24,28,65], g:[10,28], s:[1,10], sc:[24], r:"L",
+              detail:"前半[3,4,11,18,20,22,65]GK10 0-5 / 後半[2,6,8,14,15,17,24]GK28 1-5(24)" }
+        ]
+    },
+    {
+        date: "2026-02-28", title: "全国少年サッカー交流大会 in 茨城 Day1", type: "official",
+        venue: "ジャーニー土合G", weather: "", staff: [],
+        videos: [
+            { label: "1日目", url: "https://www.youtube.com/playlist?list=PLa6afX6dZQdv6-9XSza0P7xUcJioUFKIF" },
+            { label: "2日目", url: "https://www.youtube.com/playlist?list=PL-R_0FllPevNGUt7BHcOzJRoJDQLVayBf" }
+        ],
+        note: "予選グループ2位",
+        games: [
+            { n:1, o:"浦和フエルサ", t:"official", p:[2,3,4,6,8,9,10,11,14,18,20,24,28,65], g:[6,65], s:[0,2], sc:[], r:"L",
+              detail:"前半[4,8,9,11,20,24,65]GK6 0-0 / 後半[2,3,6,10,14,18,28]GK65 0-2" },
+            { n:2, o:"東本FCオレンジ", t:"official", p:[2,3,4,6,8,10,11,15,16,18,19,20,24,65], g:[9,20], s:[10,0], sc:[11,20,11,11,65,24,3,6,10,24], r:"W",
+              detail:"前半[8,11,15,16,19,20,65]GK9 5-0(11,20,11,11,65) / 後半[2,3,4,6,10,18,24]GK20 5-0(24,3,6,10,24)" },
+            { n:3, o:"INFINITYブラック", t:"official", p:[2,3,4,8,9,10,11,14,15,16,19,20,28,65], g:[4,28], s:[11,0], sc:[65,14,28,65,20,2,8,11,11,11,8], r:"W",
+              detail:"前半[9,14,15,19,20,28,65]GK4 5-0(65,14,28,65,20) / 後半[2,3,4,8,10,11,16]GK28 6-0(2,8,11,11,11,8)" },
+            { n:4, o:"アストロンFC", t:"official", p:[3,4,6,8,9,10,14,15,16,18,19,20,24,28], g:[11,65], s:[4,1], sc:[24,20,8,28], r:"W",
+              detail:"前半[6,14,15,18,19,20,24]GK11 2-0(24,20) / 後半[3,4,8,9,10,16,28]GK65 2-1(8,28)" },
+            { n:5, o:"messe宮城", t:"tm", p:[6,11,14,15,18,19,24,65], g:[10], s:[1,0], sc:[65], r:"W",
+              detail:"TM [6,11→65,14,15,18,19,24]GK10" },
+            { n:6, o:"INFINITY", t:"tm", p:[2,3,4,9,18,20,24,65], g:[18], s:[2,0], sc:[65,65], r:"W",
+              detail:"急遽追加 [2,3,4,9,20,24,65]GK18" }
+        ]
+    },
+    {
+        date: "2026-03-07", title: "TM vs クロバティ", type: "tm",
+        venue: "狭山G", weather: "晴", staff: ["川崎コーチ"],
+        videos: [{ label: "トリアネーロTM", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9W0JQtIFFQsKLrgCPSf0iQ_" }],
+        note: "",
+        games: [
+            { n:1, o:"クロバティ", t:"tm", p:[3,6,9,10,14,15,19], g:[18], s:[3,1], sc:[6,9,14], r:"W", detail:"[3,6,9,10,14,15,19]GK18" },
+            { n:2, o:"クロバティ", t:"tm", p:[3,6,9,10,15,16,18,19], g:[9], s:[4,0], sc:[10,9,10,10], r:"W", detail:"[3,6,10,15,16,18,19]GK9" },
+            { n:3, o:"クロバティ", t:"tm", p:[3,6,9,10,14,16,18,19], g:[6], s:[2,0], sc:[3,9], r:"W", detail:"[3,9,10,14,16,18,19]GK6" },
+            { n:4, o:"クロバティ", t:"tm", p:[3,6,9,10,14,15,16,18], g:[10], s:[0,0], sc:[], r:"D", detail:"[3,9,6,14,15,16,18]GK10" }
+        ]
+    },
+    {
+        date: "2026-03-08", title: "TM vs アビリスタ / EC FUJIMINO", type: "tm",
+        venue: "ふじみ野市立スポーツセンター多目的G", weather: "晴", staff: ["鈴木コーチ"],
+        videos: [{ label: "TOMAS都大会", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9UDw3bjdDRgx0_mx0bU7zeq" }],
+        note: "",
+        games: [
+            { n:1, o:"アビリスタ", t:"tm", p:[3,9,10,14,15,16,18,19], g:[3,9], s:[0,2], sc:[], r:"L",
+              detail:"前半[9,10,14,15,16,18,19]GK3 0-1 / 後半[3,10,14,15,16,18,19]GK9 0-1" },
+            { n:2, o:"EC FUJIMINO", t:"tm", p:[3,6,9,10,14,15,16,18,19], g:[6,10], s:[2,1], sc:[10,15], r:"W",
+              detail:"前半[3,9,10,15,16,18,19]GK6 2-1(10,15) / 後半[3,6,9,14,15,18,19]GK10 0-0" },
+            { n:3, o:"アビリスタ", t:"tm", p:[3,6,9,10,14,16,18,19], g:[14,15], s:[0,5], sc:[], r:"L",
+              detail:"前半[3,6,9,10,16,18,19]GK14 0-4 / 後半[3,6,9,10,14,16,19]GK15 0-1" },
+            { n:4, o:"EC FUJIMINO", t:"tm", p:[3,6,9,10,14,15,16,18,19], g:[16,18], s:[1,8], sc:[10], r:"L",
+              detail:"前半[3,6,9,14,15,18,19]GK16 0-6 / 後半[6,9,10,14,15,16,19]GK18 1-2(10)" },
+            { n:5, o:"アビリスタ", t:"tm", p:[3,6,10,14,15,16,18], g:[19], s:[0,1], sc:[], r:"L", detail:"[3,6,10,14,15,16,18]GK19" },
+            { n:6, o:"EC FUJIMINO", t:"tm", p:[6,9,10,14,15,16,18], g:[3], s:[1,2], sc:[6], r:"L", detail:"[6,9,10,14,15,16,18]GK3" },
+            { n:7, o:"アビリスタ", t:"tm", p:[3,9,10,14,15,16,18,19], g:[6], s:[0,4], sc:[], r:"L", detail:"[3,9,10,14,16,18,19]GK6 16→15" }
+        ]
+    },
+    {
+        date: "2026-03-15", title: "府中招待 新4年生大会", type: "official",
+        venue: "府中市少年サッカー場（土グランド）", weather: "晴", staff: ["川崎C","鈴木C","野口監督"],
+        videos: [{ label: "府中招待新4年生大会", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9UvcWXEf48bg7X2KNUxJQbM" }],
+        note: "Cブロック1位通過 → 準優勝",
+        games: [
+            { n:1, o:"SRサッカークラブ", t:"official", p:[2,3,4,8,10,11,14,15,17,19,20,22,24,28,65], g:[11,20], s:[1,0], sc:[28], r:"W",
+              detail:"前半[3,8,14,15,17,22,28]GK11 1-0(28) / 後半[2,4,10,11,19,24,65]GK20 0-0" },
+            { n:2, o:"府中二小フェニックスFC", t:"official", p:[2,3,6,8,9,10,11,16,17,18,19,20,22,65], g:[17,3], s:[4,0], sc:[65,20,2,22], r:"W",
+              detail:"前半[3,6,9,16,18,20,65]GK17 2-0(65,20) / 後半[2,8,10,11,17,19,22]GK3 2-0(2,22PK)" },
+            { n:3, o:"FC ゴロアーズ", t:"official", p:[3,4,6,9,14,15,16,17,18,20,22,24,28,65], g:[9,10], s:[5,0], sc:[22,22,20,22,17], r:"W",
+              detail:"前半[4,14,15,16,18,24,28]GK9 0-0 / 後半[3,6,9,17,20,22,65]GK10 5-0(22,22,20,22,17)" },
+            { n:4, o:"白百合", t:"official", p:[2,4,8,9,10,11,16,17,18,19,20,22,24,65], g:[17,4], s:[2,1], sc:[22,22], r:"W",
+              detail:"前半[2,4,8,10,11,16,18]GK17 0-1 / 後半[9,17,19,20,22,24,65]GK4 2-0(22,22)" },
+            { n:5, o:"大泉学園", t:"official", p:[2,4,8,10,11,17,20,22,65], g:[9], s:[0,1], sc:[], r:"L",
+              detail:"前半[2,4,11,17,20,22,65]GK9 0-0 / 後半[2,4,8,17,20,22,65]GK9 0-1 (2→10)" }
+        ]
+    },
+    {
+        date: "2026-03-20", title: "TM vs FC杉野（3,4年合同）", type: "tm",
+        venue: "杉野幼稚園園内グラウンド（土グランド）", weather: "曇雨", staff: ["川崎C","成田C","野口監督"],
+        videos: [{ label: "TM（FC杉野）", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9V3jdQgvZ_Gq57of9o3LS2d" }],
+        note: "3,4年合同",
+        games: [
+            { n:1, o:"FC杉野", t:"tm", p:[2,4,5,17,20,23,39,65], g:[39], s:[1,0], sc:[65], r:"W", detail:"[2,4,5,17,20,23,65]GK39" },
+            { n:2, o:"FC杉野", t:"tm", p:[3,6,8,9,14,19,28], g:[99], s:[0,1], sc:[], r:"L", detail:"[3,6,8,9,14,19,28]GK新人" },
+            { n:3, o:"FC杉野", t:"tm", p:[2,5,11,17,20,23,24,65], g:[2], s:[1,1], sc:[23], r:"D", detail:"[5,11,17,20,23,24,65]GK2" },
+            { n:4, o:"FC杉野", t:"tm", p:[3,8,9,10,15,16,19], g:[99], s:[0,1], sc:[], r:"L", detail:"[3,8,9,10,15,16,19]GK新人" },
+            { n:5, o:"FC杉野", t:"tm", p:[2,4,6,10,11,14,15,16,24,28], g:[9], s:[3,1], sc:[28,28,11], r:"W",
+              detail:"[2,4,10,14,16,24,28]GK9 14,16,28→6,11,15" }
+        ]
+    },
+    {
+        date: "2026-03-22", title: "TM vs 柏レイソルTOR", type: "tm",
+        venue: "柏レイソルTORグランド（人工芝）", weather: "曇", staff: ["川崎C","小野田C"],
+        videos: [{ label: "TM（レイソルTOR）", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9XknDOYYeKgGmyDWSBv4yOf" }],
+        note: "",
+        games: [
+            { n:1, o:"柏レイソルTOR", t:"tm", p:[4,5,9,17,20,22,23,65], g:[9], s:[2,3], sc:[17,23], r:"L", detail:"[4,5,17,20,22,23,65]GK9" },
+            { n:2, o:"柏レイソルTOR", t:"tm", p:[2,3,8,9,10,14,16,24], g:[3], s:[0,3], sc:[], r:"L", detail:"[2,8,9,10,14,16,24]GK3" },
+            { n:3, o:"柏レイソルTOR", t:"tm", p:[3,6,8,15,17,19,22,28], g:[17], s:[2,3], sc:[15,22], r:"L", detail:"[3,6,8,15,19,22,28]GK17" },
+            { n:4, o:"柏レイソルTOR", t:"tm", p:[4,5,9,10,17,20,23,65], g:[10], s:[1,2], sc:[23], r:"L", detail:"[4,5,9,17,20,23,65]GK10" },
+            { n:5, o:"柏レイソルTOR", t:"tm", p:[2,3,6,10,14,15,19,24], g:[6], s:[0,4], sc:[], r:"L", detail:"[2,3,10,14,15,19,24]GK6" },
+            { n:6, o:"柏レイソルTOR", t:"tm", p:[2,6,8,16,20,24,28,65], g:[20], s:[0,2], sc:[], r:"L", detail:"[2,6,8,16,24,28,65]GK20" },
+            { n:7, o:"柏レイソルTOR", t:"tm", p:[4,5,9,17,20,22,23], g:[10], s:[2,0], sc:[5,23], r:"W", detail:"[4,5,9,17,20,22,23]GK10" },
+            { n:8, o:"柏レイソルTOR", t:"tm", p:[3,6,10,14,15,16,19], g:[65], s:[0,1], sc:[], r:"L", detail:"[3,6,10,14,15,16,19]GK65" },
+            { n:9, o:"柏レイソルTOR", t:"tm", p:[2,3,4,6,8,10,24,28], g:[4], s:[1,4], sc:[2], r:"L", detail:"[2,3,6,8,10,24,28]GK4" },
+            { n:10, o:"柏レイソルTOR", t:"tm", p:[3,4,5,9,17,20,22,23,65], g:[3], s:[2,0], sc:[23,5], r:"W", detail:"[4,5,9,17,20,22,23]GK3 22→65" }
+        ]
+    }
+];
+
+// ========== VIDEO LINKS (all, including ones without match data) ==========
+const ALL_VIDEOS = [
+    { date:"2025-04-12", title:"TM@上谷総合公園", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9XNeU1JQP2oyjdKSSnwVPtM" },
+    { date:"2025-04-19", title:"トリアネーロカップ", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9WfTrNuMSJg33PyKlqS2OUA" },
+    { date:"2025-04-27", title:"TM レイソルTOR", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9V4tYOVX2_7r0UtaPZ_6ww7" },
+    { date:"2025-05-05", title:"市川チャレンジカップ", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9XzlnBYvfFAvFlBW7qSzPo6" },
+    { date:"2025-05-10", title:"KIDS POWER CUP", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9UZY2_-z48XifZljPlo1zA6" },
+    { date:"2025-05-25", title:"14B交流戦1次リーグ", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9VZH25_qc5m8E-lkeTf2LC_" },
+    { date:"2025-06-21", title:"ANTLERS NORTE FESTIVAL", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9UUrQeikCiKsedofBm77Ckz" },
+    { date:"2025-07-12", title:"torneo estate 2025", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9XPWjHxOz525QlEBbnEG7qr" },
+    { date:"2025-07-19", title:"小平WS交流戦", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9WuQuTBXex5qRC21xXC5VdJ" },
+    { date:"2025-07-21", title:"上尾TM", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9WeFOnFv5_L7-dcW8ySkvTE" },
+    { date:"2025-08-08", title:"センアーノ神戸TM", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9WTPtN05SOiQ0Smmo5eroVI" },
+    { date:"2025-08-09", title:"SPOG CUP U9", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9UndRv_ZT9f_9U9F1P7UHR4" },
+    { date:"2025-08-30", title:"TM（江南南）", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9XUhWVJ9h2HSPr1z5OVsay2" },
+    { date:"2025-09-06", title:"レジスタカップ2025", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9VPNB80WVK6a0zIKnKhLjFY" },
+    { date:"2025-09-14", title:"NIKEアントラーズカップ2025", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9UHCCdK2UyBV342LWdjYmux" },
+    { date:"2025-10-12", title:"三笠山カップ", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9WR_cxvKfDGXs9WQl73o5TS" },
+    { date:"2025-10-18", title:"小平WS交流戦", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9XEd6M0S3zdAENM0HMq6xGn" },
+    { date:"2025-11-02", title:"TOMAS 14B 1次予選", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9VWyywGWvkAuwXDTwof4u8n" },
+    { date:"2025-11-06", title:"学年混合TM", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9VVSa-TNh7kVFHL9Xnat54v" },
+    { date:"2025-11-08", title:"TOMAS 14B 2次予選", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9XjPpsg2u40-UUyTIw-AQbF" },
+    { date:"2025-11-23", title:"TOMAS 決勝リーグ", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9Ul8ZB8O2X-oFbSqoFHSgyN" },
+    { date:"2025-11-24", title:"TM（オーパスワン）", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9UUjhY-vYHUfxRN5kkl91pm" },
+    { date:"2026-01-12", title:"TOMAS決勝＋TM", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9X6IGa9kAdnnEUrGYx4KD_M" },
+    { date:"2026-01-24", title:"ANTLERS NEW GENERATION CUP", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9WBocryxMcyHTMcxF5ddUad" },
+    { date:"2026-02-07", title:"TM（SCH）", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9WrHW3k7jxccmFMGgRsLKwO" },
+    { date:"2026-02-23", title:"TM@東松山", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9XnDNOWzariyXAqJxE-2CrJ" },
+    { date:"2026-02-28", title:"全国少年サッカー交流大会 in 茨城 1日目", url:"https://www.youtube.com/playlist?list=PLa6afX6dZQdv6-9XSza0P7xUcJioUFKIF" },
+    { date:"2026-02-28", title:"全国少年サッカー交流大会 in 茨城 2日目", url:"https://www.youtube.com/playlist?list=PL-R_0FllPevNGUt7BHcOzJRoJDQLVayBf" },
+    { date:"2026-03-07", title:"トリアネーロTM", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9W0JQtIFFQsKLrgCPSf0iQ_" },
+    { date:"2026-03-08", title:"TOMAS都大会", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9UDw3bjdDRgx0_mx0bU7zeq" },
+    { date:"2026-03-15", title:"府中招待新4年生大会", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9UvcWXEf48bg7X2KNUxJQbM" },
+    { date:"2026-03-20", title:"TM（FC杉野）", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9V3jdQgvZ_Gq57of9o3LS2d" },
+    { date:"2026-03-22", title:"TM（レイソルTOR）", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9XknDOYYeKgGmyDWSBv4yOf" }
+];
+
+// ========== UTILITY FUNCTIONS ==========
+function playerName(num) {
+    if (num === 99) return "新人";
+    const p = PLAYERS[num];
+    return p ? p.name : "#" + num;
+}
+
+function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    return (d.getMonth()+1) + "/" + d.getDate();
+}
+
+function formatDateFull(dateStr) {
+    const d = new Date(dateStr);
+    const days = ["日","月","火","水","木","金","土"];
+    return d.getFullYear() + "." + (d.getMonth()+1) + "/" + d.getDate() + "(" + days[d.getDay()] + ")";
+}
+
+function resultLabel(r) {
+    return r === "W" ? "○" : r === "L" ? "●" : "△";
+}
+
+// Video ID maps: playlist_id -> [video_id, video_id, ...]
+const VIDEO_IDS = {
+    "PLDlLJNqV-A9XNeU1JQP2oyjdKSSnwVPtM": ["B8ciDE9qmlQ","9-xmCn4QtFw","EJFEAPKYVpo","AZ0XNJySUuE","1IefFyMhQLU","DplH2YR9998","etXCdr1g3dI","UIiXPdP1Lu4","OUeiUWxMiIA","yPJwF7bn4EE","DO1WhQIv4Ng"],
+    "PLDlLJNqV-A9WfTrNuMSJg33PyKlqS2OUA": ["zeSOJyDuoDo","Cm07LXRfFPw","R1ftSByuCLo","H1pqS1WoA1g","1q_jGsiCQiA","R584tBgD04o","I9qZkuPzrTU","YFyu6qU_BTo","rKF0SdlTyOs","Pxq53h9JkmM","W-lG7ie_SZM","n0vr2eCPznQ","vciIUpfTaLI","h7lG3anJp-Y","nyJJ4WrzpqU","f7H8ORpP9_4","v0ke1H-5i1s","mUHqZSEI7nc","wRRX-KYpPp0","KiG6hteetd0","Q8ICkLbL51w","0GkHMP3d8Bc","aR0LqPKwzII","CaBih8w8kyg"],
+    "PLDlLJNqV-A9XzlnBYvfFAvFlBW7qSzPo6": ["wWF_feqTJ-A","RaHgJpBcrlI","kzwotrmagmE","fyLmw34a4a4","NGQ-JgS4jTQ","MVGs_uiCnXc","TlYiLGJLhMc","cDA3RojxUQU","KPYPkwnjJ18","_DSxPO-lya4","IQNTqJLzP90","qJnP06on5XQ"],
+    "PLDlLJNqV-A9WTPtN05SOiQ0Smmo5eroVI": ["oygvlNylWdg","tfKB0E3wj4k","8v7DYXh6VYE"],
+    "PLDlLJNqV-A9UZY2_-z48XifZljPlo1zA6": ["orZnIrwOKU8","5TMKEPnaYvY","CGocSddXN30","hgpEtUTjhw8","VTAiGT6b-HA","okdP_06JRek","uYzQPa80YHs","QPv7nagnDZg","F8bHHloJZa8"],
+    "PLDlLJNqV-A9VZH25_qc5m8E-lkeTf2LC_": ["3pbA54W7jVA","JlCe-FwRc6o","aBlAbGETMAY","GLvAIl6AoJo","mTt3yUqKY4M","8uQ2OudzZo4","0nDFKXeGxVw","JYrP41VgqqM"],
+    "PLDlLJNqV-A9UUrQeikCiKsedofBm77Ckz": ["SzO4JKnOCyg","k6_xknexusk","wjEI9pI5H3k","E_-UO2d0snQ","7vPhiIIfeps","M9VoNPWzP7o","k2QKsVvMvNA","MFdOavssJpc"],
+    "PLDlLJNqV-A9XPWjHxOz525QlEBbnEG7qr": ["mZ5vAojT8Lk","eVfvy-o06l8","3fiQwGLWEGM","6UPxoGto3VA","G5lIabhgckk","eIm0HslQki8","J22snnI2bno","wo4u5s9_SJc","Ihm54iO2REA","O9PvVKvRpAI","O6L6X-8qjjQ","Nyeg-Qy_ODM","MVkLfxWj-Xg","PGY3LpdCzOk","8z1PCu8c_pQ","KnXHgt1GcmI"],
+    "PLDlLJNqV-A9WuQuTBXex5qRC21xXC5VdJ": ["ZJB720GthFg","aOvNQPXB1ck","H1kK2Sfjulk","TSM0cNzN0X8","JA7AOAp2g64","e0nDgV_a3d0","8RnJKrdCIQc","50iJYsbN55I","ooCRuTj8tJg","peif_Vq9uXQ","QbyvNrB-d7M"],
+    "PLDlLJNqV-A9WeFOnFv5_L7-dcW8ySkvTE": ["qug79sCviV4","A__6VU-5tc0","T7AxM0zeYRc","uXxFsQkVf4g","h7z0JfhiGck","VKjh77JhqhM","xh-2zBzwDpE","1B_fHrjXEyM","wnN78Ca17uk"],
+    "PLDlLJNqV-A9UndRv_ZT9f_9U9F1P7UHR4": ["Pjr7iu2couQ","eJgWlZke11Q","yF4MUiFMhe4","geqbzVvRzWM","mNas-8BuRrU","qkS-tIl_Djg","bj80xXicYRs","GgZIzyZYJIM","6wW7D-knfcA","XN3UW-K89zg"],
+    "PLDlLJNqV-A9XUhWVJ9h2HSPr1z5OVsay2": ["Ns3q2CYCcIE","ddjdKjP4MbA","kvVPmqcXtzA","jMj8QlshUlA","DOhapmhvWmE","m8LCQBagb9M","Rs32oc26WiY","559VAt3nty4","LnkD3JVVi_E"],
+    "PLDlLJNqV-A9VPNB80WVK6a0zIKnKhLjFY": ["4kGn7Apg2bk","UeNrdYDyXqc","1qUZRKBOUPw","IKLdWXmCSYk","-Z6EkJ2mVRw","_9s96JEuUOs","ucqq9EJzj80","KnmVPaCKlSQ","ARL1VoVwtpY","9agXKy1i5q8","JwBCA7Ohhlc","_dbzBGcNwpA","GYWD80m3u6w","LJ9V3CtGhEA","SfECrbSsSu4","sw7QAcC33LM","6Kz3KeVMPvE","bEQHbHrq9vI","in09qEqPhwE","iNjZ8mcJufo"],
+    "PLDlLJNqV-A9WR_cxvKfDGXs9WQl73o5TS": ["qlhLP5YQSGs","FJC3SKXdOMQ","IR5Y0JdOP7k","6qzd4Rs-q2M","YUUn5bSVtQk","WnZ49ygZIdo","aDZG1n45Qz0","wK4C6oTDhzY","0oI-czLX0LI","nKIchWRcgew","T-FXrbKdw0Y","24_U87WboRY","pItRPyaaluA","TS07-nMn25o","OZZLrjhDJN4","nBxN56Jkz28","OjHORPhEkmg","EjDzM9woOPI","KR-z-n7Zi_Q","XuPjoCDlY7Q"],
+    "PLDlLJNqV-A9XEd6M0S3zdAENM0HMq6xGn": ["l4cdk4AZMfM","2j8EHwuJUwE","OV3GHk3cFA8","qcz6uSzK8Hk","YTVnwAJNHco","eRW7cQC5n7Y","RkCRl5_rEWo"],
+    "PLDlLJNqV-A9VWyywGWvkAuwXDTwof4u8n": ["vC9xFIGEWAc","T0lMLzhH-o4","IqElxXyrQGQ","HOUjKYosZg0","_I7hxCCC6tY","Gyml2le3ONQ","K4EGQ29kbi0","GQyrm0NeqOY","dzyyh56QSe0"],
+    "PLDlLJNqV-A9XjPpsg2u40-UUyTIw-AQbF": ["9IF-oFch77U","5mbOV-v_lUI","hNmrCo_y-sc","hPh0EjD8zD4","yu_dcVbIKrY","ebPko5A7M_I"],
+    "PLDlLJNqV-A9Ul8ZB8O2X-oFbSqoFHSgyN": ["i3CoNHkr-Ac","rAWwlX0j2nE","_jFyzsyn9Q0","xGvDNU7A55c"],
+    "PLDlLJNqV-A9UUjhY-vYHUfxRN5kkl91pm": ["beGb4F_dki4","vxq3aveYSx8","auQbtpSmuIg","vKLKrp9CHXU","g2JORFxpX58","saWZukWd24g"],
+    "PLDlLJNqV-A9X6IGa9kAdnnEUrGYx4KD_M": ["nmQ7uUJ0vB8","MRq_uH8-D5c","b-dRFwQDZeY","iFQvzKRgjtM","8sJjJmsMZxk","Sq-v7-c6e5E","hNllXZx93qs","nPo2GkUfaoI","nT0kNNFYKhs","SQCGQLL3U7k","-0ZMUKdlAXY","OvPkm6SS-V0","QpJN2849GP4","QpJN2849GP4","VkSvW7QuTA4","Xi1XqJsQpIY"],
+    "PLDlLJNqV-A9WBocryxMcyHTMcxF5ddUad": ["8-KRln32bO4","YFOv7Uzf3SY","E_g8p3pVH68","68ZZZ2IWt74","qpEl6nkvK9E","8wObDpUVn4I","SSjV-hMcQQI","oSVvLHqSjeY","XFWgn0_cwjA","vAWZVz6b9jo","zJP3t1tZGME","q4Rv_ZtUQKg","akeJuljxCv8","fPVYdZc4cyo","dkWsk0hVlfI","_5hD8M8SycU","CdGdlbacVes","tu65CkvFl-A"],
+    "PLDlLJNqV-A9WrHW3k7jxccmFMGgRsLKwO": ["Mh0B9xHcbqE","coW789B4UGo","QCaGWN9yuW8","K3-qYRHsRhM","2bb0Rt2Bs6k","1ZizACiUfH8","MhPc5VhUooU","xCjTlurRW8A","8Mqmn3rI1IY"],
+    "PLDlLJNqV-A9XnDNOWzariyXAqJxE-2CrJ": ["-PqWrOCUSjw","VMYRATAao1w","EtHi4FO-_Mc","cWwUn2FkyYM","YewaWYM7cVk","swvjtrq4uUo","nbLGAsc7IMI","ggfb1NbRTqY"],
+    "PLa6afX6dZQdv6-9XSza0P7xUcJioUFKIF": ["T0Y17VN7f1I","ktO55Hlb7Kg","ma1ieCFlsTM","K0GsVqCGusQ","_lspO34NZv8","gRYJGD4N_wU","PuG5reAwMYQ","_rHc8-Y1oA0","49hgerUU9tU","yfyfNiSJqPU"],
+    "PL-R_0FllPevNGUt7BHcOzJRoJDQLVayBf": ["Gi5lucm_TFs","3X0Q-O-4flY","uzCDXiO2tC0","wEiVAdx67lk","ABiss6gg860","2EcCW4q6_ug","l9RJkkBhLhA","w5DB1od3B6Y","MwV4ChVhpgI"],
+    "PLDlLJNqV-A9W0JQtIFFQsKLrgCPSf0iQ_": ["n1BlMITV_-M","MdtXewMQZcs","dLLEgu1quuo","uP1hh6UIB9I","iF18GvSIRjo"],
+    "PLDlLJNqV-A9UDw3bjdDRgx0_mx0bU7zeq": ["51URXzuTbsI","wZEL8RgJyQ0","ayTGlSk3rPY","bWfPG9FNOU8","tD6crfJqads","a8IqcQcaQmM"],
+    "PLDlLJNqV-A9UvcWXEf48bg7X2KNUxJQbM": ["UrxPAH-MLsI","sZ62h8lg5SA","0_-d-JC35S8","Qb_h8oFjTNc","tv6u724xprU","0SrjSAYddYA","0vdPlkAAtH8","vnyK-WSjt9E","g-OK5Tc0T2Y","v7JQbqOMLDI"],
+    "PLDlLJNqV-A9V3jdQgvZ_Gq57of9o3LS2d": ["MUb7n6PFfCY","7GirJyjSuyQ","WiWpHWew9PI","iP9plosBQes","g8QZB7amE6w"],
+    "PLDlLJNqV-A9XknDOYYeKgGmyDWSBv4yOf": ["Mg2JzsxJD1s","0Rrjys-1a54","b78RCVQJfWo","tbfM0M8BuFs","GSVFvDUQ4Tc","GliH7gnl8QI","BfGTGvpQo9c","HcoziI5kp1E","CISrUkcfIHs","AtT8VGT6dkU"]
+};
+
+// Calculate video index for a specific game within a match day
+function getVideoIndex(matchDay, gameNum) {
+    let idx = 0; // 0-based for array access
+    for (const g of matchDay.games) {
+        if (g.n === gameNum) return idx;
+        idx += (g.detail && g.detail.includes("前半")) ? 2 : 1;
+    }
+    return idx;
+}
+
+// Determine which half a player appeared in
+function getPlayerHalf(detail, playerNum) {
+    if (!detail || !detail.includes("前半")) return null;
+    const parts = detail.split(/\//);
+    const zenPart = parts.find(p => p.includes("前半"));
+    const goPart = parts.find(p => p.includes("後半"));
+    if (!zenPart || !goPart) return null;
+    function extractPlayers(str) {
+        const nums = new Set();
+        const bm = str.match(/\[([^\]]+)\]/);
+        if (bm) bm[1].match(/\d+/g)?.forEach(n => nums.add(Number(n)));
+        const gm = str.match(/GK(\d+)/);
+        if (gm) nums.add(Number(gm[1]));
+        return nums;
+    }
+    const inZ = extractPlayers(zenPart).has(playerNum);
+    const inG = extractPlayers(goPart).has(playerNum);
+    if (inZ && inG) return "フル出場";
+    if (inZ) return "前半";
+    if (inG) return "後半";
+    return null;
+}
+
+function getGameVideoUrl(matchDay, gameNum) {
+    if (!matchDay.videos || matchDay.videos.length === 0) return null;
+    const baseUrl = matchDay.videos[0].url;
+    // Extract playlist ID from URL
+    const listMatch = baseUrl.match(/list=([^&]+)/);
+    if (!listMatch) return null;
+    const listId = listMatch[1];
+    const ids = VIDEO_IDS[listId];
+    if (!ids) return baseUrl; // fallback to playlist URL
+    const idx = getVideoIndex(matchDay, gameNum);
+    if (idx >= ids.length) return baseUrl;
+    const videoId = ids[idx];
+    return `https://www.youtube.com/watch?v=${videoId}&list=${listId}&index=${idx + 1}`;
+}
+
+// ========== STATS COMPUTATION ==========
+function computeTeamStats() {
+    let w=0, d=0, l=0, gf=0, ga=0, games=0;
+    MATCH_DAYS.forEach(md => {
+        md.games.forEach(g => {
+            games++;
+            gf += g.s[0]; ga += g.s[1];
+            if (g.r==="W") w++; else if (g.r==="D") d++; else l++;
+        });
+    });
+    return { w, d, l, gf, ga, games, matchDays: MATCH_DAYS.length };
+}
+
+function computePlayerStats(playerNum) {
+    let appearances=0, goals=0, gkGames=0, wins=0, draws=0, losses=0;
+    const matchList = [];
+
+    MATCH_DAYS.forEach(md => {
+        const playerGames = [];
+        md.games.forEach(g => {
+            if (g.p.includes(playerNum)) {
+                appearances++;
+                const goalCount = g.sc.filter(s => s === playerNum).length;
+                goals += goalCount;
+                if (g.g.includes(playerNum)) gkGames++;
+                if (g.r==="W") wins++; else if (g.r==="D") draws++; else losses++;
+                playerGames.push({ ...g, playerGoals: goalCount, isGK: g.g.includes(playerNum) });
+            }
+        });
+        if (playerGames.length > 0) {
+            matchList.push({ ...md, playerGames });
+        }
+    });
+
+    return { appearances, goals, gkGames, wins, draws, losses, matchList };
+}
+
+// ========== TAB SWITCHING ==========
+function switchTab(tabName) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+        t.classList.toggle('active', ['home','player','matches','videos'][i] === tabName);
+    });
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-' + tabName).classList.add('active');
+}
+
+// ========== RENDER HOME ==========
+function renderHome() {
+    const stats = computeTeamStats();
+    document.getElementById('home-stats').innerHTML = `
+        <div class="stat-card"><div class="stat-value">${stats.matchDays}</div><div class="stat-label">試合日</div></div>
+        <div class="stat-card"><div class="stat-value">${stats.games}</div><div class="stat-label">試合数</div></div>
+        <div class="stat-card"><div class="stat-value">${stats.gf}</div><div class="stat-label">総得点</div></div>
+        <div class="stat-card"><div class="stat-value">${stats.w}</div><div class="stat-label">勝利</div></div>
+        <div class="stat-card"><div class="stat-value">${stats.d}</div><div class="stat-label">引分</div></div>
+        <div class="stat-card"><div class="stat-value">${stats.l}</div><div class="stat-label">敗戦</div></div>
+    `;
+    const total = stats.w + stats.d + stats.l;
+    document.getElementById('home-record-bar').innerHTML = `
+        <div class="record-w" style="width:${stats.w/total*100}%"></div>
+        <div class="record-d" style="width:${stats.d/total*100}%"></div>
+        <div class="record-l" style="width:${stats.l/total*100}%"></div>
+    `;
+    document.getElementById('home-record-text').textContent =
+        `${stats.w}勝 ${stats.d}分 ${stats.l}敗（勝率 ${(stats.w/total*100).toFixed(1)}%）/ 得失点 ${stats.gf}-${stats.ga}（${stats.gf-stats.ga>=0?"+":""}${stats.gf-stats.ga}）`;
+
+    // Recent matches (last 3)
+    const recent = [...MATCH_DAYS].reverse().slice(0, 3);
+    document.getElementById('home-recent').innerHTML = recent.map(md => {
+        const w = md.games.filter(g=>g.r==="W").length;
+        const d = md.games.filter(g=>g.r==="D").length;
+        const l = md.games.filter(g=>g.r==="L").length;
+        return `<div class="match-card" onclick="switchTab('matches')">
+            <div class="match-header">
+                <div class="match-date">${formatDate(md.date)}</div>
+                <div class="match-title">${md.title}</div>
+                <div style="font-size:12px;font-weight:700;">${w}勝${d}分${l}敗</div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ========== RENDER PLAYER SELECTOR ==========
+function renderPlayerSelector() {
+    const select = document.getElementById('player-select');
+    const sorted = Object.entries(PLAYERS)
+        .filter(([num]) => num !== "39" && num !== "99")
+        .sort((a,b) => Number(a[0]) - Number(b[0]));
+    sorted.forEach(([num, p]) => {
+        const opt = document.createElement('option');
+        opt.value = num;
+        opt.textContent = `#${num} ${p.name}${p.romaji ? ' (' + p.romaji + ')' : ''}${p.age ? ' ' + p.age : ''}`;
+        select.appendChild(opt);
+    });
+}
+
+// ========== RENDER PLAYER VIEW ==========
+function renderPlayerView() {
+    const num = Number(document.getElementById('player-select').value);
+    const statsArea = document.getElementById('player-stats-area');
+    const matchesArea = document.getElementById('player-matches');
+
+    if (!num) {
+        statsArea.style.display = 'none';
+        matchesArea.innerHTML = '<div class="no-data">背番号を選択すると、出場記録が表示されます</div>';
+        return;
+    }
+
+    const stats = computePlayerStats(num);
+    statsArea.style.display = 'grid';
+    statsArea.innerHTML = `
+        <div class="player-stat"><div class="val">${stats.appearances}</div><div class="lbl">出場</div></div>
+        <div class="player-stat"><div class="val">${stats.goals}</div><div class="lbl">得点</div></div>
+        <div class="player-stat"><div class="val">${stats.gkGames}</div><div class="lbl">GK</div></div>
+        <div class="player-stat"><div class="val">${stats.wins}勝${stats.losses}敗</div><div class="lbl">勝敗</div></div>
+    `;
+
+    if (stats.matchList.length === 0) {
+        matchesArea.innerHTML = '<div class="no-data">出場記録がありません</div>';
+        return;
+    }
+
+    matchesArea.innerHTML = stats.matchList.reverse().map(md => {
+        const gamesHtml = md.playerGames.map(g => {
+            const playersHtml = g.p.map(pn => {
+                if (pn === num) return `<span class="highlight">${playerName(pn)}</span>`;
+                return playerName(pn);
+            }).join(', ');
+            const gkName = g.g.map(gn => {
+                if (gn === num) return `<span class="highlight">GK:${playerName(gn)}</span>`;
+                return `GK:${playerName(gn)}`;
+            }).join('/');
+
+            const gameVideoUrl = getGameVideoUrl(md, g.n);
+            const gameVideoBtn = gameVideoUrl
+                ? `<a href="${gameVideoUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:#ff0000;font-weight:700;text-decoration:none;margin-left:auto;">&#9654; 動画</a>`
+                : '';
+            const half = getPlayerHalf(g.detail, num);
+            const halfBadge = half && half !== "フル出場"
+                ? `<span style="font-size:10px;background:${half==='前半'?'#e3f2fd':'#fff3e0'};color:${half==='前半'?'#1565c0':'#e65100'};padding:2px 6px;border-radius:3px;font-weight:700;">${half}</span>`
+                : '';
+
+            return `<div class="game-row">
+                <div class="game-top">
+                    <span class="game-num">${g.n}</span>
+                    <span class="game-opponent">vs ${g.o}</span>
+                    ${halfBadge}
+                    ${gameVideoBtn}
+                    <span class="game-score">${g.s[0]}-${g.s[1]}</span>
+                    <span class="game-result result-${g.r}">${resultLabel(g.r)}</span>
+                </div>
+                ${g.isGK ? '<div style="font-size:11px;color:var(--orange);font-weight:700;">GK出場</div>' : ''}
+                ${g.playerGoals > 0 ? '<div class="game-scorers">&#9917; ' + g.playerGoals + '得点</div>' : ''}
+            </div>`;
+        }).join('');
+
+        const videoHtml = md.videos.map(v =>
+            `<a href="${v.url}" target="_blank" class="video-btn">&#9654; ${v.label}</a>`
+        ).join(' ');
+
+        return `<div class="match-card open">
+            <div class="match-header">
+                <div class="match-date">${formatDate(md.date)}</div>
+                <div class="match-title">${md.title}</div>
+                <span class="match-badge ${md.type==='official'?'badge-official':md.type==='mixed'?'badge-mixed':'badge-tm'}">${md.type==='official'?'公式':md.type==='mixed'?'公式+TM':'TM'}</span>
+            </div>
+            <div class="match-detail" style="display:block;">
+                ${gamesHtml}
+                ${videoHtml}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ========== RENDER ALL MATCHES ==========
+function renderMatches() {
+    const list = document.getElementById('matches-list');
+    list.innerHTML = [...MATCH_DAYS].reverse().map(md => {
+        const w = md.games.filter(g=>g.r==="W").length;
+        const d = md.games.filter(g=>g.r==="D").length;
+        const l = md.games.filter(g=>g.r==="L").length;
+        const gf = md.games.reduce((s,g)=>s+g.s[0],0);
+        const ga = md.games.reduce((s,g)=>s+g.s[1],0);
+
+        const gamesHtml = md.games.map(g => {
+            const scorerNames = g.sc.map(s => playerName(s)).join(', ');
+            const gameVideoUrl = getGameVideoUrl(md, g.n);
+            const gameVideoBtn = gameVideoUrl
+                ? `<a href="${gameVideoUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:#ff0000;font-weight:700;text-decoration:none;margin-left:auto;">&#9654;</a>`
+                : '';
+            return `<div class="game-row">
+                <div class="game-top">
+                    <span class="game-num">${g.n}</span>
+                    <span class="game-opponent">vs ${g.o}</span>
+                    ${gameVideoBtn}
+                    <span class="game-score">${g.s[0]}-${g.s[1]}</span>
+                    <span class="game-result result-${g.r}">${resultLabel(g.r)}</span>
+                </div>
+                <div class="game-players">${g.detail}</div>
+                ${scorerNames ? '<div class="game-scorers">&#9917; ' + scorerNames + '</div>' : ''}
+            </div>`;
+        }).join('');
+
+        const videoHtml = md.videos.map(v =>
+            `<a href="${v.url}" target="_blank" class="video-btn">&#9654; ${v.label}</a>`
+        ).join(' ');
+
+        return `<div class="match-card" onclick="this.classList.toggle('open')">
+            <div class="match-header">
+                <div class="match-date">${formatDate(md.date)}</div>
+                <div class="match-title">${md.title}</div>
+                <span class="match-badge ${md.type==='official'?'badge-official':md.type==='mixed'?'badge-mixed':'badge-tm'}">${md.type==='official'?'公式':md.type==='mixed'?'公式+TM':'TM'}</span>
+                <span class="match-toggle">&#9660;</span>
+            </div>
+            <div class="match-detail">
+                <div class="match-info">
+                    <span>${w}勝${d}分${l}敗</span>
+                    <span>得失点 ${gf}-${ga}</span>
+                    ${md.venue ? '<span>'+md.venue+'</span>' : ''}
+                </div>
+                ${md.note ? '<div class="tournament-badge">' + md.note + '</div>' : ''}
+                ${gamesHtml}
+                ${videoHtml}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ========== RENDER VIDEOS ==========
+function renderVideos() {
+    const list = document.getElementById('videos-list');
+    // 古い順（時系列順）で表示
+    const sorted = [...ALL_VIDEOS].sort((a,b) => a.date.localeCompare(b.date));
+    list.innerHTML = sorted.map(v => {
+        return `<div class="video-card">
+            <div class="v-date">${formatDate(v.date)}</div>
+            <div class="v-title">${v.title}</div>
+            <a href="${v.url}" target="_blank" class="v-link">&#9654; 再生</a>
+        </div>`;
+    }).join('');
+}
+
+// ========== RENDER TIMELINE ==========
+function renderTimeline() {
+    const monthly = {};
+    MATCH_DAYS.forEach(md => {
+        const key = md.date.substring(0, 7); // "2025-04"
+        if (!monthly[key]) monthly[key] = { w:0, d:0, l:0 };
+        md.games.forEach(g => {
+            if (g.r==="W") monthly[key].w++; else if (g.r==="D") monthly[key].d++; else monthly[key].l++;
+        });
+    });
+    const months = Object.keys(monthly).sort();
+    const maxGames = Math.max(...months.map(m => monthly[m].w + monthly[m].d + monthly[m].l));
+
+    document.getElementById('home-timeline').innerHTML = months.map(m => {
+        const { w, d, l } = monthly[m];
+        const total = w + d + l;
+        const pct = (n) => (n / maxGames * 100) + '%';
+        const label = m.replace('2025-','\'25/').replace('2026-','\'26/');
+        return `<div class="tl-row">
+            <span class="tl-label">${label}</span>
+            <div class="tl-bar">
+                <div class="tl-w" style="width:${pct(w)}"></div>
+                <div class="tl-d" style="width:${pct(d)}"></div>
+                <div class="tl-l" style="width:${pct(l)}"></div>
+            </div>
+            <span class="tl-text">${w}勝${d}分${l}敗</span>
+        </div>`;
+    }).join('');
+}
+
+// ========== RENDER TOURNAMENTS ==========
+function renderTournaments() {
+    const tournamentDefs = [
+        { key:"TOMAS", name:"TOMAS 14ブロック", matchFilter: t => t.includes("TOMAS") },
+        { key:"ANTLERS_GEN", name:"ANTLERS NEW GENERATION CUP", matchFilter: t => t.includes("ANTLERS NEW") },
+        { key:"TRIANELLO", name:"トリアネーロカップ", matchFilter: t => t.includes("TRIANELLO") || t.includes("トリアネーロカップ") },
+        { key:"TORNEO", name:"Torneo estate 2025", matchFilter: t => t.includes("Torneo") || t.includes("torneo") },
+        { key:"REGISTA", name:"レジスタカップ2025", matchFilter: t => t.includes("レジスタカップ") },
+        { key:"MIKASA", name:"三笠山カップ", matchFilter: t => t.includes("三笠山") },
+        { key:"SPOG", name:"SPOG CUP U9", matchFilter: t => t.includes("SPOG") },
+        { key:"ZENKOKU", name:"全国少年サッカー交流大会 in 茨城", matchFilter: t => t.includes("全国少年") },
+        { key:"FUCHU", name:"府中招待 新4年生大会", matchFilter: t => t.includes("府中招待") },
+        { key:"ICHIKAWA", name:"市川チャレンジカップ", matchFilter: t => t.includes("市川") },
+        { key:"KIDS", name:"KIDS POWER CUP", matchFilter: t => t.includes("KIDS POWER") && !t.includes("TRIANELLO") },
+        { key:"NORTE_FES", name:"アントラーズ・ノルテFestival", matchFilter: t => t.includes("ノルテFestival") || t.includes("ANTLERS NORTE") },
+    ];
+
+    const html = tournamentDefs.map(td => {
+        const mds = MATCH_DAYS.filter(md => td.matchFilter(md.title));
+        if (mds.length === 0) return '';
+        let w=0, d=0, l=0, gf=0, ga=0;
+        const officialOnly = [];
+        mds.forEach(md => md.games.forEach(g => {
+            if (g.t === "official") { officialOnly.push(g); w += g.r==="W"?1:0; d += g.r==="D"?1:0; l += g.r==="L"?1:0; gf += g.s[0]; ga += g.s[1]; }
+        }));
+        if (officialOnly.length === 0) {
+            mds.forEach(md => md.games.forEach(g => { w += g.r==="W"?1:0; d += g.r==="D"?1:0; l += g.r==="L"?1:0; gf += g.s[0]; ga += g.s[1]; }));
+        }
+        const dates = mds.map(md => formatDate(md.date)).join(', ');
+        const notes = mds.map(md => md.note).filter(n => n).join(' / ');
+        const resultColor = notes.includes("優勝") ? "background:gold;color:#333;" :
+                           notes.includes("準優勝") ? "background:#c0c0c0;color:#333;" :
+                           notes.includes("1位") ? "background:var(--green-mid);color:var(--green);" : "background:#f0f0f0;color:#555;";
+
+        return `<div class="tournament-card">
+            <div class="tc-header">
+                <span class="tc-name">${td.name}</span>
+                ${notes ? `<span class="tc-result" style="${resultColor}">${notes}</span>` : ''}
+            </div>
+            <div class="tc-dates">${dates} / ${mds.length}日間</div>
+            <div class="tc-games">公式 ${w}勝${d}分${l}敗 / 得失点 ${gf}-${ga}（${gf-ga>=0?"+":""}${gf-ga}）</div>
+            <div class="record-bar" style="margin-top:6px;">
+                ${(w+d+l)>0 ? `<div class="record-w" style="width:${w/(w+d+l)*100}%"></div><div class="record-d" style="width:${d/(w+d+l)*100}%"></div><div class="record-l" style="width:${l/(w+d+l)*100}%"></div>` : ''}
+            </div>
+        </div>`;
+    }).filter(h => h).join('');
+
+    document.getElementById('home-tournaments').innerHTML = html;
+}
+
+// ========== OPPONENT HISTORY ==========
+function renderOpponents() {
+    const opps = {};
+    MATCH_DAYS.forEach(md => {
+        md.games.forEach(g => {
+            const name = g.o.replace(/^vs\s*/, '').trim();
+            if (!opps[name]) opps[name] = { w:0, d:0, l:0, gf:0, ga:0, dates:[] };
+            opps[name].w += g.r==="W"?1:0;
+            opps[name].d += g.r==="D"?1:0;
+            opps[name].l += g.r==="L"?1:0;
+            opps[name].gf += g.s[0];
+            opps[name].ga += g.s[1];
+            if (!opps[name].dates.includes(md.date)) opps[name].dates.push(md.date);
+        });
+    });
+
+    const sorted = Object.entries(opps).sort((a,b) => {
+        const ta = a[1].w+a[1].d+a[1].l;
+        const tb = b[1].w+b[1].d+b[1].l;
+        return tb - ta;
+    });
+
+    document.getElementById('matches-by-opponents').innerHTML = sorted.map(([name, o]) => {
+        const total = o.w + o.d + o.l;
+        return `<div class="opp-card">
+            <div class="opp-header">
+                <span class="opp-name">${name}</span>
+                <span class="opp-record">${o.w}勝${o.d}分${o.l}敗</span>
+            </div>
+            <div class="opp-bar">
+                <div class="record-w" style="width:${o.w/total*100}%"></div>
+                <div class="record-d" style="width:${o.d/total*100}%"></div>
+                <div class="record-l" style="width:${o.l/total*100}%"></div>
+            </div>
+            <div class="opp-detail">対戦${total}試合 / 得失点 ${o.gf}-${o.ga} / ${o.dates.map(d=>formatDate(d)).join(', ')}</div>
+        </div>`;
+    }).join('');
+}
+
+function showMatchView(view) {
+    const btnDates = document.getElementById('btn-dates');
+    const btnOpp = document.getElementById('btn-opponents');
+    const listEl = document.getElementById('matches-list');
+    const oppEl = document.getElementById('matches-by-opponents');
+    const titleEl = document.getElementById('matches-title');
+    if (view === 'dates') {
+        btnDates.style.background = 'var(--green)'; btnDates.style.color = 'white';
+        btnOpp.style.background = 'white'; btnOpp.style.color = 'var(--green)';
+        listEl.style.display = 'block'; oppEl.style.display = 'none';
+        titleEl.textContent = '全試合結果';
+    } else {
+        btnOpp.style.background = 'var(--green)'; btnOpp.style.color = 'white';
+        btnDates.style.background = 'white'; btnDates.style.color = 'var(--green)';
+        listEl.style.display = 'none'; oppEl.style.display = 'block';
+        titleEl.textContent = '対戦相手別';
+    }
+}
+
+// ========== INIT ==========
+renderHome();
+renderTimeline();
+renderTournaments();
+renderPlayerSelector();
+renderPlayerView();
+renderMatches();
+renderOpponents();
+renderVideos();
+</script>
+</body>
+</html>
