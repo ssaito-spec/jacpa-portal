@@ -529,18 +529,8 @@
         <div class="section-title">月別成績</div>
         <div id="home-timeline"></div>
 
-        <div class="section-title">大会まとめ</div>
-        <div id="home-tournaments"></div>
-
         <div class="section-title">直近の試合</div>
         <div id="home-recent"></div>
-
-        <div class="section-title">リンク</div>
-        <div class="page-links">
-            <a href="https://ssaito-spec.github.io/jacpa-team/quiz.html" class="page-link" target="_blank">
-                <span class="link-icon">&#10067;</span>クイズ
-            </a>
-        </div>
     </div>
 
     <!-- ROSTER TAB -->
@@ -549,6 +539,9 @@
         <div id="staff-grid" class="staff-grid"></div>
         <div class="section-title">PLAYERS</div>
         <div id="roster-grid" class="player-grid"></div>
+        <div style="text-align:center;margin-top:30px;padding-bottom:20px;">
+            <a href="https://ssaito-spec.github.io/jacpa-team/quiz.html" target="_blank" style="display:inline-block;padding:14px 40px;background:var(--green);color:white;text-decoration:none;border-radius:30px;font-size:15px;font-weight:700;transition:background 0.2s;">クイズに挑戦！</a>
+        </div>
     </div>
 
     <!-- PLAYER TAB -->
@@ -1820,7 +1813,6 @@ MATCH_DAYS.sort((a, b) => a.date.localeCompare(b.date));
 renderHome();
 renderRoster();
 renderTimeline();
-renderTournaments();
 renderPlayerSelector();
 renderPlayerView();
 renderMatches();
