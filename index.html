@@ -432,6 +432,49 @@
         .opp-bar { height:6px; border-radius:3px; overflow:hidden; display:flex; margin-top:6px; }
         .opp-detail { font-size:11px; color:#888; margin-top:4px; }
 
+        /* Timeline */
+        .timeline { position:relative; padding-left:28px; }
+        .timeline::before {
+            content:''; position:absolute; left:10px; top:0; bottom:0;
+            width:3px; background:#e0e0e0; border-radius:2px;
+        }
+        .tl-month {
+            position:relative; margin-bottom:8px; margin-top:24px;
+            font-size:15px; font-weight:900; color:var(--green);
+        }
+        .tl-month::before {
+            content:''; position:absolute; left:-22px; top:4px;
+            width:13px; height:13px; border-radius:50%;
+            background:var(--green); border:3px solid white;
+            box-shadow:0 0 0 2px var(--green);
+        }
+        .tl-event {
+            position:relative; background:white; border-radius:10px;
+            padding:12px 14px; margin-bottom:10px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.05);
+        }
+        .tl-event::before {
+            content:''; position:absolute; left:-20px; top:16px;
+            width:9px; height:9px; border-radius:50%;
+            background:#ccc; border:2px solid white;
+        }
+        .tl-event.highlight::before { background:var(--green); }
+        .tl-event.lowlight::before { background:#e74c3c; }
+        .tl-event.award::before { background:#f39c12; }
+        .tl-event-title { font-size:13px; font-weight:700; margin-bottom:4px; }
+        .tl-event-body { font-size:12px; color:#666; line-height:1.7; }
+        .tl-quote {
+            margin-top:8px; padding:8px 12px;
+            background:#f8f8f8; border-left:3px solid var(--green);
+            border-radius:0 6px 6px 0;
+            font-size:11px; color:#555; line-height:1.7; font-style:italic;
+        }
+        .tl-chapter {
+            text-align:center; margin:30px 0 16px;
+            font-size:11px; font-weight:700; color:#888;
+            letter-spacing:2px; text-transform:uppercase;
+        }
+
         /* Venue cards */
         .venue-card {
             background:white; border-radius:12px; padding:14px 16px; margin-bottom:8px;
@@ -531,6 +574,9 @@
     <div class="tab" onclick="switchTab('player')">
         <span class="tab-icon">&#128100;</span>マイ選手
     </div>
+    <div class="tab" onclick="switchTab('history')">
+        <span class="tab-icon">&#128214;</span>History
+    </div>
     <!-- 会場タブ（データ準備中）
     <div class="tab" onclick="switchTab('venues')">
         <span class="tab-icon">&#128205;</span>会場
@@ -579,6 +625,15 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
             慧パパに修正依頼
         </a>
+    </div>
+
+    <!-- HISTORY TAB -->
+    <div id="tab-history" class="tab-content">
+        <div style="text-align:center;margin-bottom:20px;">
+            <div style="font-size:22px;font-weight:900;color:#1a1a1a;">U9の1年間</div>
+            <div style="font-size:12px;color:#888;">2025年3月 — 2026年3月</div>
+        </div>
+        <div class="timeline" id="timeline-content"></div>
     </div>
 
     <!-- VENUES TAB -->
@@ -1518,7 +1573,7 @@ function computePlayerStats(playerNum) {
 // ========== TAB SWITCHING ==========
 function switchTab(tabName) {
     document.querySelectorAll('.tab').forEach((t, i) => {
-        t.classList.toggle('active', ['home','roster','matches','videos','player','venues'][i] === tabName);
+        t.classList.toggle('active', ['home','roster','matches','videos','player','history','venues'][i] === tabName);
     });
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById('tab-' + tabName).classList.add('active');
@@ -1755,6 +1810,105 @@ function renderVideos() {
     }).join('');
 }
 
+// ========== RENDER HISTORY ==========
+function renderHistory() {
+    const timeline = [
+        { chapter: "第1章：始動" },
+        { month: "3月", year: "2025" },
+        { title:"チーム発足・顔合わせ", cls:"highlight",
+          body:"背番号決め、ユニフォーム採寸。4名が上の学年に帯同中（#5,#11,#23,#65）。" },
+        { title:"春合宿（4日間）", cls:"highlight",
+          body:"初の合宿。「自分のことは自分でやる」がテーマ。怪我人・体調不良者ゼロ。",
+          quote:"できない、わからないがたくさんありましたが、今回の合宿を通してたくさんの事を知ることができたと思います — 川﨑コーチ" },
+
+        { month: "4月", year: "2025" },
+        { title:"初試合 vs 上尾朝日", cls:"highlight",
+          body:"上谷総合公園にて全12試合。順調なスタートに見えた。動画撮影・共有の文化がこの日からスタート。" },
+        { title:"トリアネーロカップ（本栖湖遠征）", cls:"",
+          body:"初の1泊2日遠征。グループリーグ1位通過するも、上位トーナメントで苦戦。",
+          quote:"とても身も心も頭も全てで強化できた2日間。本当に伸び代しかないと思いました！！ — 川﨑コーチ" },
+        { title:"自己紹介動画", cls:"",
+          body:"慧パパが先陣を切り、全家庭から動画が投稿される流れに。チームの一体感が生まれた瞬間。" },
+
+        { chapter: "第2章：壁" },
+        { month: "5月", year: "2025" },
+        { title:"14ブロック大会 — 初の公式戦で1回戦敗退", cls:"lowlight",
+          body:"クラブ史上稀に見る結果。大きな挫折を経験。",
+          quote:"初めての公式戦になります！勝利を目指して頑張りますので、応援宜しくお願いします！ — 川﨑コーチ（試合前）" },
+        { title:"メンバー離脱が始まる", cls:"lowlight",
+          body:"5月末に1名が退団。その後7月にもう1名、9月にもう1名と続く。" },
+
+        { month: "6月", year: "2025" },
+        { title:"アントラーズ・ノルテFestival", cls:"",
+          body:"茨城遠征。9-0の大勝もあれば0-4の完敗もあり。成長と課題が入り混じる。" },
+        { title:"J観戦（FC東京 vs セレッソ大阪）", cls:"",
+          body:"味の素スタジアムへ。雨で前半撤退するも、プロの試合を肌で感じる体験に。" },
+
+        { month: "7月", year: "2025" },
+        { title:"Torneo estate（ひたち海浜公園遠征）", cls:"",
+          body:"砂浜ダッシュ、海、花火。子供たちは日本代表の試合に夢中。保護者たちはお酒に夢中。",
+          quote:"「継続する」ことがまだまだです。ここを乗り越えた先に自立した人間、選手になれると信じています — 川﨑コーチ" },
+        { title:"菅平夏合宿（4日間）", cls:"highlight",
+          body:"4年生と合同。名物の坂ダッシュ、BBQ。春合宿よりハードだが全員無事に完走。",
+          quote:"「FC選手としての自覚」を明日からもって意識高く生活して欲しいです — 野口監督" },
+
+        { chapter: "第3章：転機" },
+        { month: "8-9月", year: "2025" },
+        { title:"帯同組合流 — #11陸、#65凌雅がU9へ", cls:"highlight",
+          body:"上の学年で活動していた2名がチームに合流。戦力が一気に厚くなる。#5正斗と#23惺渚は引き続きU10帯同。" },
+        { title:"レジスタカップ（鹿島遠征）", cls:"",
+          body:"合流メンバーを含む11名で挑む。勝ち負け以上に「サッカーへの向き合い方」を問われた遠征。",
+          quote:"日常生活から選手含めた家族全員でサッカーの事を意識していただき、家族全員でサッカーをJACPAでプレーすることを楽しんでもらえたら — 川﨑コーチ" },
+        { title:"NIKEアントラーズカップ", cls:"",
+          body:"新座片山FC戦で9-2の大勝。チームとしてのまとまりが見え始める。" },
+
+        { chapter: "第4章：成長" },
+        { month: "10-11月", year: "2025" },
+        { title:"三笠山カップ（茨城遠征）", cls:"",
+          body:"偶然見れた鹿島の花火大会。保護者同士の荷物リレーなど、チームワークも成熟。" },
+        { title:"TOMAS 14ブロック — 予選突破", cls:"highlight",
+          body:"前回1回戦敗退のためシード権なし。一次リーグから這い上がり、予選突破。",
+          quote:"前回の悔しさを返す時が来ました。笑顔で終われるように選手、保護者含めてチーム一丸となって頑張りましょう！ — 川﨑コーチ" },
+        { title:"TOMAS 14ブロック — 準優勝", cls:"award",
+          body:"決勝トーナメントを勝ち上がり、決勝へ。惜しくも敗れるが、春の1回戦敗退から考えれば大きな成長。" },
+
+        { chapter: "第5章：次のステージへ" },
+        { month: "12月", year: "2025" },
+        { title:"年末メッセージ", cls:"",
+          body:"",
+          quote:"4月から活動が始まり、チーム全員でサッカーを知っていき、自分と向き合い、伸び代をたくさん感じる一年だったと思います — 川﨑コーチ" },
+
+        { month: "1月", year: "2026" },
+        { title:"TOMAS 14B決勝 vs OXALA — 準優勝", cls:"award",
+          body:"公式戦の集大成。あと一歩及ばず。" },
+        { title:"ANTLERS NEW GENERATION CUP", cls:"",
+          body:"ジャーニィ若松Gにて2日間。予選グループ1位通過も、決勝リーグで強豪に敗れ5位。" },
+
+        { month: "2-3月", year: "2026" },
+        { title:"全国少年サッカー交流大会 in 茨城", cls:"",
+          body:"朝5:30集合、マイクロバスで茨城へ。INFINITYブラック戦11-0、東本FC戦10-0など圧勝も。" },
+        { title:"府中招待 新4年生大会 — 準優勝", cls:"award",
+          body:"Cブロック1位で通過し、決勝へ。0-1で惜敗するも、成長の証。" },
+        { title:"新メンバー4名加入", cls:"highlight",
+          body:"#25陸(加藤)、#29正雄、#30裕史、#73繁晴がチームに加わる。" },
+        { title:"川﨑コーチ続投発表", cls:"highlight",
+          body:"",
+          quote:"今年一年で学んできた点と点を線で繋いでいけるよう全力で選手たちと向き合って参ります。闘う集団にしていきます — 川﨑コーチ" },
+        { title:"春合宿（鹿鳴館） — 4年生として再始動", cls:"highlight",
+          body:"3年生にブラジル体操を教える側に。1年前、何もできなかった選手たちが後輩を指導する姿に成長を実感。" },
+    ];
+
+    document.getElementById('timeline-content').innerHTML = timeline.map(item => {
+        if (item.chapter) return `<div class="tl-chapter">${item.chapter}</div>`;
+        if (item.month) return `<div class="tl-month">${item.year}年${item.month}</div>`;
+        return `<div class="tl-event ${item.cls||''}">
+            <div class="tl-event-title">${item.title}</div>
+            ${item.body ? `<div class="tl-event-body">${item.body}</div>` : ''}
+            ${item.quote ? `<div class="tl-quote">${item.quote}</div>` : ''}
+        </div>`;
+    }).join('');
+}
+
 // ========== RENDER VENUES ==========
 function renderVenues() {
     const venueMap = {};
@@ -1969,6 +2123,7 @@ function showMatchView(view) {
 MATCH_DAYS.sort((a, b) => a.date.localeCompare(b.date));
 renderHome();
 renderRoster();
+renderHistory();
 renderVenues();
 renderTimeline();
 renderPlayerSelector();
