@@ -482,9 +482,14 @@
             <button onclick="showMatchView('dates')" id="btn-dates" style="flex:1;padding:10px;border:2px solid var(--green);border-radius:8px;background:var(--green);color:white;font-weight:700;font-size:13px;cursor:pointer;">試合日別</button>
             <button onclick="showMatchView('opponents')" id="btn-opponents" style="flex:1;padding:10px;border:2px solid var(--green);border-radius:8px;background:white;color:var(--green);font-weight:700;font-size:13px;cursor:pointer;">対戦相手別</button>
         </div>
-        <div id="matches-by-opponents" style="display:none;"></div>
-        <div class="section-title" id="matches-title">全試合結果</div>
-        <div id="matches-list"></div>
+        <div id="view-dates">
+            <div class="section-title">全試合結果</div>
+            <div id="matches-list"></div>
+        </div>
+        <div id="view-opponents" style="display:none;">
+            <div class="section-title">対戦相手別</div>
+            <div id="matches-by-opponents"></div>
+        </div>
     </div>
 
     <!-- VIDEOS TAB -->
@@ -1669,19 +1674,16 @@ function renderOpponents() {
 function showMatchView(view) {
     const btnDates = document.getElementById('btn-dates');
     const btnOpp = document.getElementById('btn-opponents');
-    const listEl = document.getElementById('matches-list');
-    const oppEl = document.getElementById('matches-by-opponents');
-    const titleEl = document.getElementById('matches-title');
     if (view === 'dates') {
         btnDates.style.background = 'var(--green)'; btnDates.style.color = 'white';
         btnOpp.style.background = 'white'; btnOpp.style.color = 'var(--green)';
-        listEl.style.display = 'block'; oppEl.style.display = 'none';
-        titleEl.textContent = '全試合結果';
+        document.getElementById('view-dates').style.display = 'block';
+        document.getElementById('view-opponents').style.display = 'none';
     } else {
         btnOpp.style.background = 'var(--green)'; btnOpp.style.color = 'white';
         btnDates.style.background = 'white'; btnDates.style.color = 'var(--green)';
-        listEl.style.display = 'none'; oppEl.style.display = 'block';
-        titleEl.textContent = '対戦相手別';
+        document.getElementById('view-dates').style.display = 'none';
+        document.getElementById('view-opponents').style.display = 'block';
     }
 }
 
