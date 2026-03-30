@@ -554,6 +554,8 @@
         </div>
         <div id="player-stats-area" class="player-stats" style="display:none;"></div>
         <div id="player-matches"></div>
+        <!-- フローティング報告ボタン（マイ選手タブ内のみ表示） -->
+        <a id="report-btn" href="#" onclick="sendReport(event)" style="position:fixed;bottom:20px;right:20px;width:48px;height:48px;border-radius:50%;background:rgba(0,100,60,0.85);color:white;display:flex;align-items:center;justify-content:center;font-size:20px;text-decoration:none;box-shadow:0 3px 12px rgba(0,0,0,0.2);z-index:200;">!</a>
     </div>
 
     <!-- MATCHES TAB -->
@@ -1479,6 +1481,16 @@ function switchTab(tabName) {
     });
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById('tab-' + tabName).classList.add('active');
+    const rb = document.getElementById('report-btn');
+    if (rb) rb.style.display = tabName === 'player' ? 'flex' : 'none';
+}
+
+function sendReport(e) {
+    e.preventDefault();
+    const sel = document.getElementById('player-select');
+    const player = sel.options[sel.selectedIndex]?.text || '';
+    const msg = encodeURIComponent(`【ポータル報告】\n選手：${player}\n内容：（ここに書いてね）`);
+    window.open(`https://line.me/R/share?text=${msg}`, '_blank');
 }
 
 // ========== RENDER HOME ==========
