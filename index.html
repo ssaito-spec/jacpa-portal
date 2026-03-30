@@ -1456,51 +1456,48 @@ function renderPlayerView() {
 
     matchesArea.innerHTML = stats.matchList.map(md => {
         const gamesHtml = md.playerGames.map(g => {
-            const playersHtml = g.p.map(pn => {
-                if (pn === num) return `<span class="highlight">${playerName(pn)}</span>`;
-                return playerName(pn);
-            }).join(', ');
-            const gkName = g.g.map(gn => {
-                if (gn === num) return `<span class="highlight">GK:${playerName(gn)}</span>`;
-                return `GK:${playerName(gn)}`;
-            }).join('/');
-
             const gameVideoUrl = getGameVideoUrl(md, g.n);
             const gameVideoBtn = gameVideoUrl
                 ? `<a href="${gameVideoUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#606060;font-weight:600;text-decoration:none;margin-left:auto;display:inline-flex;align-items:center;gap:3px;background:#f5f5f5;padding:2px 8px;border-radius:4px;border:1px solid #e0e0e0;"><span style="display:inline-block;width:14px;height:10px;background:#ff0000;border-radius:2px;position:relative;"><span style="position:absolute;left:5px;top:2px;border-left:5px solid white;border-top:3px solid transparent;border-bottom:3px solid transparent;"></span></span>動画</a>`
                 : '';
             const half = getPlayerHalf(g.detail, num);
-            const halfBadge = half && half !== "フル出場"
-                ? `<span style="font-size:10px;background:${half==='前半'?'#e3f2fd':'#fff3e0'};color:${half==='前半'?'#1565c0':'#e65100'};padding:2px 6px;border-radius:3px;font-weight:700;">${half}</span>`
-                : '';
+            let tags = '';
+            if (half && half !== "フル出場") {
+                const gkTag = g.isGK ? '(GK出場)' : '';
+                tags = `<span style="font-size:10px;background:${half==='前半'?'#e3f2fd':'#fff3e0'};color:${half==='前半'?'#1565c0':'#e65100'};padding:2px 6px;border-radius:3px;font-weight:700;">${half}${gkTag}</span>`;
+            } else if (g.isGK) {
+                tags = `<span style="font-size:10px;background:#fff3e0;color:#e65100;padding:2px 6px;border-radius:3px;font-weight:700;">GK出場</span>`;
+            }
 
             return `<div class="game-row">
                 <div class="game-top">
                     <span class="game-num">${g.n}</span>
                     <span class="game-opponent">vs ${g.o}</span>
-                    ${halfBadge}
+                    ${tags}
                     ${gameVideoBtn}
                     <span class="game-score">${g.s[0]}-${g.s[1]}</span>
                     <span class="game-result result-${g.r}">${resultLabel(g.r)}</span>
                 </div>
-                ${g.isGK ? '<div style="font-size:11px;color:var(--orange);font-weight:700;">GK出場</div>' : ''}
                 ${g.playerGoals > 0 ? '<div class="game-scorers">&#9917; ' + g.playerGoals + '得点</div>' : ''}
             </div>`;
         }).join('');
 
-        const videoHtml = md.videos.map(v =>
-            `<a href="${v.url}" target="_blank" class="video-btn"><span class="yt-icon"></span>${v.label}</a>`
-        ).join(' ');
+        // バッジはタイトル直後、全動画リンクはヘッダー右上
+        const badgeClass = md.type==='official'?'badge-official':md.type==='invite'?'badge-invite':md.type==='mixed'?'badge-mixed':'badge-tm';
+        const badgeText = md.type==='official'?'公式':md.type==='invite'?'招待':md.type==='mixed'?'公式+TM':'TM';
+        const headerVideoBtn = md.videos.length > 0
+            ? `<a href="${md.videos[0].url}" target="_blank" onclick="event.stopPropagation()" class="video-btn" style="margin:0;padding:4px 10px;"><span class="yt-icon"></span>${md.videos.length > 1 ? '全動画' : md.videos[0].label}</a>`
+            : '';
 
         return `<div class="match-card open">
-            <div class="match-header">
+            <div class="match-header" style="flex-wrap:wrap;">
                 <div class="match-date">${formatDate(md.date)}</div>
                 <div class="match-title">${md.title}</div>
-                <span class="match-badge ${md.type==='official'?'badge-official':md.type==='invite'?'badge-invite':md.type==='mixed'?'badge-mixed':'badge-tm'}">${md.type==='official'?'公式':md.type==='invite'?'招待':md.type==='mixed'?'公式+TM':'TM'}</span>
+                <span class="match-badge ${badgeClass}">${badgeText}</span>
+                <div style="margin-left:auto;">${headerVideoBtn}</div>
             </div>
             <div class="match-detail" style="display:block;">
                 ${gamesHtml}
-                ${videoHtml}
             </div>
         </div>`;
     }).join('');
