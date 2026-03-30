@@ -405,9 +405,9 @@
         .tl-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; }
         .tl-label { min-width:45px; font-weight:700; color:#555; text-align:right; }
         .tl-bar { flex:1; display:flex; height:20px; border-radius:4px; overflow:hidden; }
-        .tl-w { background:var(--green); }
-        .tl-d { background:#f39c12; }
-        .tl-l { background:#e74c3c; }
+        .tl-w { background:rgba(0,100,60,0.5); }
+        .tl-d { background:rgba(243,156,18,0.45); }
+        .tl-l { background:rgba(231,76,60,0.35); }
         .tl-text { min-width:80px; font-size:11px; color:#888; }
 
         /* Tournament card */
@@ -1501,17 +1501,47 @@ function renderHome() {
     document.getElementById('home-record-text').textContent =
         `${stats.w}勝 ${stats.d}分 ${stats.l}敗（勝率 ${(stats.w/total*100).toFixed(1)}%）/ 得失点 ${stats.gf}-${stats.ga}（${stats.gf-stats.ga>=0?"+":""}${stats.gf-stats.ga}）`;
 
-    // Recent matches (last 3)
+    // Recent matches (last 3) - same format as matches tab
     const recent = [...MATCH_DAYS].reverse().slice(0, 3);
     document.getElementById('home-recent').innerHTML = recent.map(md => {
         const w = md.games.filter(g=>g.r==="W").length;
         const d = md.games.filter(g=>g.r==="D").length;
         const l = md.games.filter(g=>g.r==="L").length;
-        return `<div class="match-card" onclick="switchTab('matches')">
+        const gf = md.games.reduce((s,g)=>s+g.s[0],0);
+        const ga = md.games.reduce((s,g)=>s+g.s[1],0);
+        const badgeClass = md.type==='official'?'badge-official':md.type==='invite'?'badge-invite':md.type==='mixed'?'badge-mixed':'badge-tm';
+        const badgeText = md.type==='official'?'公式':md.type==='invite'?'招待':md.type==='mixed'?'公式+TM':'TM';
+        const gamesHtml = md.games.map(g => {
+            const scorerNames = g.sc.map(s => playerName(s)).join(', ');
+            const gameVideoUrl = getGameVideoUrl(md, g.n);
+            const gameVideoBtn = gameVideoUrl
+                ? `<a href="${gameVideoUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#606060;font-weight:600;text-decoration:none;margin-left:auto;display:inline-flex;align-items:center;gap:3px;background:#f5f5f5;padding:2px 8px;border-radius:4px;border:1px solid #e0e0e0;"><span style="display:inline-block;width:14px;height:10px;background:#ff0000;border-radius:2px;position:relative;"><span style="position:absolute;left:5px;top:2px;border-left:5px solid white;border-top:3px solid transparent;border-bottom:3px solid transparent;"></span></span>動画</a>`
+                : '';
+            return `<div class="game-row">
+                <div class="game-top">
+                    <span class="game-num">${g.n}</span>
+                    <span class="game-opponent">vs ${g.o}</span>
+                    ${gameVideoBtn}
+                    <span class="game-score">${g.s[0]}-${g.s[1]}</span>
+                    <span class="game-result result-${g.r}">${resultLabel(g.r)}</span>
+                </div>
+                ${scorerNames ? '<div class="game-scorers">&#9917; ' + scorerNames + '</div>' : ''}
+            </div>`;
+        }).join('');
+        const videoHtml = md.videos.length > 0
+            ? `<div style="font-size:12px;color:#888;margin-top:10px;display:flex;align-items:center;gap:8px;">大会動画：${md.videos.map(v => `<a href="${v.url}" target="_blank" class="video-btn" style="margin:0;padding:4px 10px;"><span class="yt-icon"></span>${v.label}</a>`).join(' ')}</div>`
+            : '';
+        return `<div class="match-card" onclick="this.classList.toggle('open')">
             <div class="match-header">
                 <div class="match-date">${formatDate(md.date)}</div>
                 <div class="match-title">${md.title}</div>
-                <div style="font-size:12px;font-weight:700;">${w}勝${d}分${l}敗</div>
+                <span class="match-badge ${badgeClass}">${badgeText}</span>
+                <span class="match-toggle">&#9660;</span>
+            </div>
+            <div class="match-detail">
+                <div class="match-info"><span>${w}勝${d}分${l}敗</span><span>得失点 ${gf}-${ga}</span></div>
+                ${gamesHtml}
+                ${videoHtml}
             </div>
         </div>`;
     }).join('');
