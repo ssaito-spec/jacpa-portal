@@ -249,18 +249,34 @@
         .video-btn {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: #ff0000;
-            color: white;
+            gap: 5px;
+            padding: 6px 12px;
+            background: #f9f9f9;
+            color: #606060;
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 600;
             margin-top: 10px;
-            transition: opacity 0.2s;
+            border: 1px solid #e0e0e0;
+            transition: background 0.2s;
         }
-        .video-btn:hover { opacity: 0.85; }
+        .video-btn:hover { background: #f0f0f0; }
+        .video-btn .yt-icon {
+            display: inline-block;
+            width: 18px; height: 13px;
+            background: #ff0000;
+            border-radius: 3px;
+            position: relative;
+        }
+        .video-btn .yt-icon::after {
+            content: '';
+            position: absolute;
+            left: 7px; top: 3px;
+            border-left: 6px solid white;
+            border-top: 3.5px solid transparent;
+            border-bottom: 3.5px solid transparent;
+        }
 
         /* Video list */
         .video-card {
@@ -285,15 +301,20 @@
             font-weight: 600;
         }
         .video-card .v-link {
-            background: #ff0000;
-            color: white;
+            background: #f9f9f9;
+            color: #606060;
             padding: 6px 12px;
             border-radius: 6px;
+            border: 1px solid #e0e0e0;
             text-decoration: none;
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 600;
             white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
+        .video-card .v-link:hover { background: #f0f0f0; }
 
         /* Section title */
         .section-title {
@@ -426,14 +447,14 @@
     <div class="tab active" onclick="switchTab('home')">
         <span class="tab-icon">&#9917;</span>HOME
     </div>
-    <div class="tab" onclick="switchTab('player')">
-        <span class="tab-icon">&#128100;</span>マイ選手
-    </div>
     <div class="tab" onclick="switchTab('matches')">
         <span class="tab-icon">&#128203;</span>試合
     </div>
     <div class="tab" onclick="switchTab('videos')">
         <span class="tab-icon">&#9654;</span>動画
+    </div>
+    <div class="tab" onclick="switchTab('player')">
+        <span class="tab-icon">&#128100;</span>マイ選手
     </div>
 </div>
 
@@ -1216,8 +1237,7 @@ function playerName(num) {
 
 function formatDate(dateStr) {
     const d = new Date(dateStr);
-    const y = String(d.getFullYear()).slice(2);
-    return y + "/" + (d.getMonth()+1) + "/" + d.getDate();
+    return d.getFullYear() + "/" + (d.getMonth()+1) + "/" + d.getDate();
 }
 
 function formatDateFull(dateStr) {
@@ -1352,7 +1372,7 @@ function computePlayerStats(playerNum) {
 // ========== TAB SWITCHING ==========
 function switchTab(tabName) {
     document.querySelectorAll('.tab').forEach((t, i) => {
-        t.classList.toggle('active', ['home','player','matches','videos'][i] === tabName);
+        t.classList.toggle('active', ['home','matches','videos','player'][i] === tabName);
     });
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById('tab-' + tabName).classList.add('active');
@@ -1447,7 +1467,7 @@ function renderPlayerView() {
 
             const gameVideoUrl = getGameVideoUrl(md, g.n);
             const gameVideoBtn = gameVideoUrl
-                ? `<a href="${gameVideoUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:#ff0000;font-weight:700;text-decoration:none;margin-left:auto;">&#9654; 動画</a>`
+                ? `<a href="${gameVideoUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#606060;font-weight:600;text-decoration:none;margin-left:auto;display:inline-flex;align-items:center;gap:3px;background:#f5f5f5;padding:2px 8px;border-radius:4px;border:1px solid #e0e0e0;"><span style="display:inline-block;width:14px;height:10px;background:#ff0000;border-radius:2px;position:relative;"><span style="position:absolute;left:5px;top:2px;border-left:5px solid white;border-top:3px solid transparent;border-bottom:3px solid transparent;"></span></span>動画</a>`
                 : '';
             const half = getPlayerHalf(g.detail, num);
             const halfBadge = half && half !== "フル出場"
@@ -1469,7 +1489,7 @@ function renderPlayerView() {
         }).join('');
 
         const videoHtml = md.videos.map(v =>
-            `<a href="${v.url}" target="_blank" class="video-btn">&#9654; ${v.label}</a>`
+            `<a href="${v.url}" target="_blank" class="video-btn"><span class="yt-icon"></span>${v.label}</a>`
         ).join(' ');
 
         return `<div class="match-card open">
@@ -1500,7 +1520,7 @@ function renderMatches() {
             const scorerNames = g.sc.map(s => playerName(s)).join(', ');
             const gameVideoUrl = getGameVideoUrl(md, g.n);
             const gameVideoBtn = gameVideoUrl
-                ? `<a href="${gameVideoUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;color:#ff0000;font-weight:700;text-decoration:none;margin-left:auto;">&#9654;</a>`
+                ? `<a href="${gameVideoUrl}" target="_blank" onclick="event.stopPropagation()" style="font-size:10px;color:#606060;font-weight:600;text-decoration:none;margin-left:auto;display:inline-flex;align-items:center;gap:3px;background:#f5f5f5;padding:2px 8px;border-radius:4px;border:1px solid #e0e0e0;"><span style="display:inline-block;width:14px;height:10px;background:#ff0000;border-radius:2px;position:relative;"><span style="position:absolute;left:5px;top:2px;border-left:5px solid white;border-top:3px solid transparent;border-bottom:3px solid transparent;"></span></span>動画</a>`
                 : '';
             return `<div class="game-row">
                 <div class="game-top">
@@ -1516,7 +1536,7 @@ function renderMatches() {
         }).join('');
 
         const videoHtml = md.videos.map(v =>
-            `<a href="${v.url}" target="_blank" class="video-btn">&#9654; ${v.label}</a>`
+            `<a href="${v.url}" target="_blank" class="video-btn"><span class="yt-icon"></span>${v.label}</a>`
         ).join(' ');
 
         return `<div class="match-card" onclick="this.classList.toggle('open')">
@@ -1549,7 +1569,7 @@ function renderVideos() {
         return `<div class="video-card">
             <div class="v-date">${formatDate(v.date)}</div>
             <div class="v-title">${v.title}</div>
-            <a href="${v.url}" target="_blank" class="v-link">&#9654; 再生</a>
+            <a href="${v.url}" target="_blank" class="v-link"><span class="yt-icon"></span>再生</a>
         </div>`;
     }).join('');
 }
@@ -1690,6 +1710,7 @@ function showMatchView(view) {
 }
 
 // ========== INIT ==========
+MATCH_DAYS.sort((a, b) => a.date.localeCompare(b.date));
 renderHome();
 renderTimeline();
 renderTournaments();
