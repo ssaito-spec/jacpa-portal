@@ -1729,7 +1729,7 @@ function renderHome() {
 function renderPlayerSelector() {
     const select = document.getElementById('player-select');
     const sorted = Object.entries(PLAYERS)
-        .filter(([num]) => num !== "39" && num !== "99")
+        .filter(([num]) => !["13","39","99"].includes(num))
         .sort((a,b) => Number(a[0]) - Number(b[0]));
     sorted.forEach(([num, p]) => {
         const opt = document.createElement('option');
