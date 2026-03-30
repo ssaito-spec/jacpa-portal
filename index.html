@@ -912,11 +912,11 @@ const MATCH_DAYS = [
         note: "",
         games: [
             { n:1, o:"Wings U-12", t:"invite", p:[2,4,9,10,11,17,20,22,65], g:[9], s:[0,2], sc:[], r:"L",
-              detail:"[2,11,17,20,22,65]GK9 4→10" },
+              detail:"前半[2,11,17,20,22,65]GK9 / 後半[2,10,11,17,20,22,65]GK9 4→10" },
             { n:2, o:"カシマスクール選抜", t:"invite", p:[2,4,9,10,11,17,18,20,65], g:[4], s:[0,0], sc:[], r:"D",
-              detail:"[2,11,17,18,20,65]GK4 9→10" },
+              detail:"前半[2,11,17,18,20,65]GK4 / 後半[2,10,11,17,18,20,65]GK4 9→10" },
             { n:3, o:"新座片山FC", t:"invite", p:[4,9,10,11,17,18,20,22,65], g:[17], s:[9,2], sc:[9,10,10,10,20,22,22,22,65], r:"W",
-              detail:"[4,10,11,18,22,65]GK17 9→20" },
+              detail:"前半[4,10,11,18,22,65]GK17 / 後半[4,10,11,18,20,22,65]GK17 9→20" },
             { n:4, o:"レジスタ", t:"invite", p:[2,4,10,11,17,20,22,65], g:[10], s:[0,2], sc:[], r:"L",
               detail:"[2,4,11,17,20,22,65]GK10" },
             { n:5, o:"中野島FC", t:"invite", p:[9,10,11,17,18,20,22,65], g:[17], s:[1,3], sc:[], r:"L",
@@ -929,14 +929,15 @@ const MATCH_DAYS = [
         date: "2025-09-15", title: "NIKEアントラーズカップ2025 Day2", type: "invite",
         venue: "ジャーニィ土合グラウンド", weather: "", staff: [],
         videos: [{ label: "NIKEアントラーズカップ2025", url: "https://www.youtube.com/playlist?list=PLDlLJNqV-A9UHCCdK2UyBV342LWdjYmux" }],
+        vo: 9, // Day1: 試合1-3(前後半×3=6) + 試合4-6(TM×3=3) = 9本
         note: "",
         games: [
             { n:1, o:"江南南", t:"invite", p:[2,4,9,10,11,17,18,20,65], g:[4], s:[1,2], sc:[9], r:"L",
-              detail:"[9,10,11,17,20,65]GK4 18→2" },
+              detail:"前半[9,10,11,17,20,65]GK4 / 後半[2,9,10,11,17,20,65]GK4 18→2" },
             { n:2, o:"オーパスワン", t:"invite", p:[2,4,9,10,11,17,20,22,65], g:[9], s:[1,2], sc:[10], r:"L",
-              detail:"[2,4,10,11,22,65]GK9 17→20" },
+              detail:"前半[2,4,10,11,22,65]GK9 / 後半[2,4,10,11,20,22,65]GK9 17→20" },
             { n:3, o:"FCリアル", t:"invite", p:[2,9,10,11,17,18,20,22,65], g:[22], s:[1,1], sc:[10], r:"W",
-              detail:"[9,10,11,17,18,20,65]GK22→2 PK2-0" },
+              detail:"前半[9,10,11,17,18,20,65]GK22 / 後半[2,9,10,11,17,18,20,65]GK22 PK2-0", vs:3 },
             { n:4, o:"アントラーズノルテ", t:"invite", p:[2,4,9,10,17,18,20,22], g:[4], s:[1,0], sc:[18], r:"W",
               detail:"[2,9,10,17,18,20,22]GK4" },
             { n:5, o:"上尾朝日", t:"invite", p:[2,4,9,10,11,17,18,20,22,65], g:[4], s:[0,2], sc:[], r:"L",
@@ -1387,10 +1388,11 @@ const VIDEO_IDS = {
 
 // Calculate video index for a specific game within a match day
 function getVideoIndex(matchDay, gameNum) {
-    let idx = 0; // 0-based for array access
+    let idx = matchDay.vo || 0; // vo = video offset for shared playlists
     for (const g of matchDay.games) {
         if (g.n === gameNum) return idx;
-        idx += (g.detail && g.detail.includes("前半")) ? 2 : 1;
+        // vs = explicit video slot count, otherwise auto-detect from detail
+        idx += g.vs || ((g.detail && g.detail.includes("前半")) ? 2 : 1);
     }
     return idx;
 }
