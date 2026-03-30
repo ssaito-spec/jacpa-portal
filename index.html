@@ -118,7 +118,7 @@
         /* Player stats summary */
         .player-stats {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 8px;
             margin-bottom: 16px;
         }
@@ -1549,7 +1549,6 @@ function renderPlayerView() {
         <div class="player-stat"><div class="val">${stats.appearances}</div><div class="lbl">出場</div></div>
         <div class="player-stat"><div class="val">${stats.goals}</div><div class="lbl">得点</div></div>
         <div class="player-stat"><div class="val">${stats.gkGames}</div><div class="lbl">GK</div></div>
-        <div class="player-stat"><div class="val">${stats.wins}勝${stats.losses}敗</div><div class="lbl">勝敗</div></div>
     `;
 
     if (stats.matchList.length === 0) {
