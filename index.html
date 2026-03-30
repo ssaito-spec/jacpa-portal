@@ -605,8 +605,12 @@ const PLAYERS = {
     24: { name: "蒼之", romaji: "Soshi", age: "U9" },
     28: { name: "然", romaji: "Zen", age: "U8" },
     13: { name: "#13", romaji: "", age: "U9" },
+    25: { name: "陸(加藤)", romaji: "Riku K.", age: "U9" },
+    29: { name: "正雄", romaji: "Masao", age: "U9" },
+    30: { name: "裕史", romaji: "Yuushi", age: "U9" },
     39: { name: "#39", romaji: "", age: "" },
-    65: { name: "凌雅", romaji: "Ryoga", age: "U9" }
+    65: { name: "凌雅", romaji: "Ryoga", age: "U9" },
+    73: { name: "繁晴", romaji: "Shigeharu", age: "U9" }
 };
 
 // ========== MATCH DATA ==========
@@ -1655,15 +1659,19 @@ function renderRoster() {
     </div>`).join('');
 
     // Players
-    const sorted = Object.entries(PLAYERS)
-        .filter(([n]) => PLAYER_IMAGES[n])
+    const rosterPlayers = Object.entries(PLAYERS)
+        .filter(([n]) => !['13','39','99'].includes(n))
         .sort((a,b) => Number(a[0]) - Number(b[0]));
-    document.getElementById('roster-grid').innerHTML = sorted.map(([num, p]) => {
+    document.getElementById('roster-grid').innerHTML = rosterPlayers.map(([num, p]) => {
+        const hasPhoto = PLAYER_IMAGES[num];
         const labelClass = p.age.includes('U8') ? 'p-label-u8' : p.age.includes('U10') ? 'p-label-u10' : 'p-label-u9';
         const labelText = p.age.includes('U10') ? 'U10帯同' : p.age.includes('U8') ? 'U8' : 'U9';
+        const imgHtml = hasPhoto
+            ? `<img src="${IMG_BASE}選手紹介用/${PLAYER_IMAGES[num]}" alt="${p.name}">`
+            : `<div style="width:100%;aspect-ratio:3/4;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:12px;font-weight:600;">Coming Soon</div>`;
         return `<div class="p-card">
             <span class="p-label ${labelClass}">${labelText}</span>
-            <img src="${IMG_BASE}選手紹介用/${PLAYER_IMAGES[num]}" alt="${p.name}">
+            ${imgHtml}
             <div class="p-card-info">
                 <div class="p-card-num">${num}</div>
                 <div class="p-card-name">${p.name}</div>
