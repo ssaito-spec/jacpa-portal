@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JACPA東京FC 2025年4月入団学年用サイト</title>
+    <title>JACPA東京FC 2025年4月入団学年 チームサイト</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -555,7 +555,7 @@
     <img src="https://ssaito-spec.github.io/jacpa-team/その他/logo.jpeg" alt="JACPA東京FC">
     <div class="header-text">
         <h1>JACPA東京FC</h1>
-        <div class="season">2025年4月入団メンバー ポータルサイト</div>
+        <div class="season">2025年4月入団メンバー チームサイト</div>
     </div>
 </div>
 
@@ -681,7 +681,7 @@
 
 <div class="footer">
     <div style="background:#fff3e0;color:#e65100;padding:8px 16px;border-radius:8px;font-size:11px;font-weight:600;margin-bottom:12px;display:inline-block;">このサイトは関係者限定公開です。URLの外部共有はご遠慮ください。</div>
-    <div>JACPA東京FC 2025年4月入団メンバー ポータルサイト</div>
+    <div>JACPA東京FC 2025年4月入団メンバー チームサイト</div>
 </div>
 
 <script>
@@ -1590,7 +1590,7 @@ function sendReport(e) {
     e.preventDefault();
     const sel = document.getElementById('player-select');
     const player = sel.options[sel.selectedIndex]?.text || '';
-    const msg = encodeURIComponent(`【ポータル報告】\n選手：${player}\n内容：（ここに書いてね）`);
+    const msg = encodeURIComponent(`【チームサイト報告】\n選手：${player}\n内容：（ここに書いてね）`);
     window.open(`https://line.me/R/share?text=${msg}`, '_blank');
 }
 
