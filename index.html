@@ -534,10 +534,71 @@
             font-weight: 700;
             color: white;
         }
-        .p-card { position: relative; }
+        .p-card { position: relative; cursor: pointer; transition: transform 0.15s; }
+        .p-card:active { transform: scale(0.97); }
         .p-label-u9 { background: var(--green); }
         .p-label-u8 { background: #e67e22; }
         .p-label-u10 { background: #3498db; }
+
+        /* Roster Modal */
+        .roster-modal {
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 1000;
+            justify-content: center; align-items: center;
+        }
+        .roster-modal.active { display: flex; }
+        .roster-modal-content {
+            display: flex; flex-direction: column;
+            background: #fff; border-radius: 16px; overflow: hidden;
+            max-width: 500px; max-height: 90vh;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            animation: rosterModalIn 0.3s ease;
+        }
+        @keyframes rosterModalIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .roster-modal-image {
+            width: 100%; max-height: 60vh;
+            object-fit: cover; object-position: top;
+        }
+        .roster-modal-image.crop-left { object-position: left top; }
+        .roster-modal-info {
+            padding: 25px 30px; display: flex; align-items: center; gap: 20px;
+            background: linear-gradient(135deg, #fafafa 0%, #fff 100%);
+            border-top: 4px solid var(--green);
+        }
+        .roster-modal-number {
+            font-size: 72px; font-weight: 900; color: #1a1a1a;
+            font-family: Impact, 'Helvetica Neue', sans-serif;
+            transform: skewX(-10deg); line-height: 1;
+            text-shadow: 3px 3px 0 var(--green);
+        }
+        .roster-modal-name-area { flex: 1; }
+        .roster-modal-name-kanji { font-size: 32px; font-weight: 800; color: #1a1a1a; }
+        .roster-modal-name-romaji { font-size: 14px; color: #666; text-transform: uppercase; margin-top: 5px; }
+        .roster-modal-role { font-size: 16px; color: #666; margin-bottom: 5px; }
+        .roster-modal-close {
+            position: absolute; top: 15px; right: 15px;
+            width: 36px; height: 36px;
+            background: rgba(0,0,0,0.5); border: none; border-radius: 50%;
+            font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; transition: background 0.2s;
+        }
+        .roster-modal-close:hover { background: rgba(0,0,0,0.7); }
+        .roster-modal-nav {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 50px; height: 50px;
+            background: rgba(255,255,255,0.9); border: none; border-radius: 50%;
+            font-size: 24px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: #333; transition: background 0.2s, transform 0.2s;
+        }
+        .roster-modal-nav:hover { background: #fff; transform: translateY(-50%) scale(1.1); }
+        .roster-modal-prev { left: 20px; }
+        .roster-modal-next { right: 20px; }
 
         /* Staff cards */
         .staff-grid {
@@ -1966,7 +2027,7 @@ function renderRoster() {
     document.getElementById('staff-grid').innerHTML = [
         { name:'野口監督', role:'監督', img:'野口監督_trimmed.jpg' },
         { name:'川﨑コーチ', role:'コーチ', img:'その他/川﨑コーチ.jpg' }
-    ].map(s => `<div class="p-card">
+    ].map(s => `<div class="p-card" onclick="openRosterModal('${IMG_BASE}${s.img}')">
         <img src="${IMG_BASE}${s.img}" alt="${s.name}">
         <div class="p-card-info" style="text-align:center;">
             <div class="p-card-sub">${s.role}</div>
@@ -1985,7 +2046,8 @@ function renderRoster() {
         const imgHtml = hasPhoto
             ? `<img src="${IMG_BASE}選手紹介用/${PLAYER_IMAGES[num]}" alt="${p.name}">`
             : `<div style="width:100%;aspect-ratio:3/4;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:12px;font-weight:600;">Coming Soon</div>`;
-        return `<div class="p-card">
+        const clickHandler = hasPhoto ? `onclick="openRosterModal('${IMG_BASE}選手紹介用/${PLAYER_IMAGES[num]}')"` : '';
+        return `<div class="p-card" ${clickHandler}>
             <span class="p-label ${labelClass}">${labelText}</span>
             ${imgHtml}
             <div class="p-card-info">
@@ -2169,6 +2231,78 @@ renderPlayerView();
 renderMatches();
 renderOpponents();
 renderVideos();
+</script>
+
+<!-- Roster Modal -->
+<div class="roster-modal" id="roster-modal">
+    <button class="roster-modal-close" onclick="closeRosterModal()">&times;</button>
+    <button class="roster-modal-nav roster-modal-prev" onclick="prevRosterMember()">&larr;</button>
+    <button class="roster-modal-nav roster-modal-next" onclick="nextRosterMember()">&rarr;</button>
+    <div class="roster-modal-content">
+        <img class="roster-modal-image" id="roster-modal-image" src="" alt="">
+        <div class="roster-modal-info">
+            <div class="roster-modal-number" id="roster-modal-number"></div>
+            <div class="roster-modal-name-area">
+                <div class="roster-modal-role" id="roster-modal-role"></div>
+                <div class="roster-modal-name-kanji" id="roster-modal-name-kanji"></div>
+                <div class="roster-modal-name-romaji" id="roster-modal-name-romaji"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========== ROSTER MODAL ==========
+const rosterModal = document.getElementById('roster-modal');
+let rosterMembers = [];
+let rosterCurrentIndex = 0;
+
+(function buildRosterMembers() {
+    rosterMembers = [
+        { image: IMG_BASE + '野口監督_trimmed.jpg', number: '', name: '野口監督', romaji: '', role: '監督', cropLeft: true },
+        { image: IMG_BASE + 'その他/川﨑コーチ.jpg', number: '', name: '川﨑コーチ', romaji: '', role: 'コーチ', cropLeft: false }
+    ];
+    Object.entries(PLAYERS)
+        .filter(([n]) => !['13','39','99'].includes(n) && PLAYER_IMAGES[n])
+        .sort((a,b) => Number(a[0]) - Number(b[0]))
+        .forEach(([num, p]) => {
+            rosterMembers.push({
+                image: IMG_BASE + '選手紹介用/' + PLAYER_IMAGES[num],
+                number: num, name: p.name, romaji: p.romaji, role: '', cropLeft: false
+            });
+        });
+})();
+
+function showRosterMember(index) {
+    const m = rosterMembers[index];
+    const img = document.getElementById('roster-modal-image');
+    img.src = m.image;
+    if (m.cropLeft) img.classList.add('crop-left'); else img.classList.remove('crop-left');
+    const numEl = document.getElementById('roster-modal-number');
+    numEl.textContent = m.number; numEl.style.display = m.number ? 'block' : 'none';
+    document.getElementById('roster-modal-name-kanji').textContent = m.name;
+    document.getElementById('roster-modal-name-romaji').textContent = m.romaji;
+    const roleEl = document.getElementById('roster-modal-role');
+    roleEl.textContent = m.role; roleEl.style.display = m.role ? 'block' : 'none';
+}
+
+function openRosterModal(imageSrc) {
+    const idx = rosterMembers.findIndex(m => m.image === imageSrc);
+    rosterCurrentIndex = idx >= 0 ? idx : 0;
+    showRosterMember(rosterCurrentIndex);
+    rosterModal.classList.add('active');
+}
+function closeRosterModal() { rosterModal.classList.remove('active'); }
+function nextRosterMember() { rosterCurrentIndex = (rosterCurrentIndex + 1) % rosterMembers.length; showRosterMember(rosterCurrentIndex); }
+function prevRosterMember() { rosterCurrentIndex = (rosterCurrentIndex - 1 + rosterMembers.length) % rosterMembers.length; showRosterMember(rosterCurrentIndex); }
+
+rosterModal.addEventListener('click', (e) => { if (e.target === rosterModal) closeRosterModal(); });
+document.addEventListener('keydown', (e) => {
+    if (!rosterModal.classList.contains('active')) return;
+    if (e.key === 'Escape') closeRosterModal();
+    else if (e.key === 'ArrowRight') nextRosterMember();
+    else if (e.key === 'ArrowLeft') prevRosterMember();
+});
 </script>
 </body>
 </html>
