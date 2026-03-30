@@ -1423,7 +1423,7 @@ function renderPlayerSelector() {
     sorted.forEach(([num, p]) => {
         const opt = document.createElement('option');
         opt.value = num;
-        opt.textContent = `#${num} ${p.name}${p.romaji ? ' (' + p.romaji + ')' : ''}${p.age ? ' ' + p.age : ''}`;
+        opt.textContent = `#${num} ${p.name}`;
         select.appendChild(opt);
     });
 }
