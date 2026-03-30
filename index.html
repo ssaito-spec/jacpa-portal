@@ -1585,22 +1585,21 @@ function renderPlayerView() {
             </div>`;
         }).join('');
 
-        // バッジはタイトル直後、全動画リンクはヘッダー右上
         const badgeClass = md.type==='official'?'badge-official':md.type==='invite'?'badge-invite':md.type==='mixed'?'badge-mixed':'badge-tm';
         const badgeText = md.type==='official'?'公式':md.type==='invite'?'招待':md.type==='mixed'?'公式+TM':'TM';
-        const headerVideoBtn = md.videos.length > 0
-            ? `<a href="${md.videos[0].url}" target="_blank" onclick="event.stopPropagation()" class="video-btn" style="margin:0;padding:4px 10px;"><span class="yt-icon"></span>${md.videos.length > 1 ? '全動画' : md.videos[0].label}</a>`
+        const playlistHtml = md.videos.length > 0
+            ? `<div style="font-size:12px;color:#888;margin-top:10px;display:flex;align-items:center;gap:8px;">大会動画：${md.videos.map(v => `<a href="${v.url}" target="_blank" class="video-btn" style="margin:0;padding:4px 10px;"><span class="yt-icon"></span>${v.label}</a>`).join(' ')}</div>`
             : '';
 
         return `<div class="match-card open">
-            <div class="match-header" style="flex-wrap:wrap;">
+            <div class="match-header">
                 <div class="match-date">${formatDate(md.date)}</div>
                 <div class="match-title">${md.title}</div>
                 <span class="match-badge ${badgeClass}">${badgeText}</span>
-                <div style="margin-left:auto;">${headerVideoBtn}</div>
             </div>
             <div class="match-detail" style="display:block;">
                 ${gamesHtml}
+                ${playlistHtml}
             </div>
         </div>`;
     }).join('');
