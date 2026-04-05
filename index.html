@@ -825,6 +825,7 @@
 <div class="footer">
     <div style="background:#fff3e0;color:#e65100;padding:8px 16px;border-radius:8px;font-size:11px;font-weight:600;margin-bottom:12px;display:inline-block;">このサイトは関係者限定公開です。URLの外部共有はご遠慮ください。</div>
     <div>JACPA東京FC 2025年4月入団メンバー チームサイト</div>
+    <div style="font-size:10px;color:#bbb;margin-top:8px;">v2.1.0 — 2026.04.06</div>
 </div>
 
 <script>
@@ -1727,6 +1728,7 @@ function switchTab(tabName) {
     document.getElementById('tab-' + tabName).classList.add('active');
     const rb = document.getElementById('report-btn');
     if (rb) rb.style.display = tabName === 'player' ? 'flex' : 'none';
+    try { localStorage.setItem('jacpa-portal-tab', tabName); } catch(e) {}
 }
 
 function sendReport(e) {
@@ -2313,6 +2315,12 @@ renderPlayerView();
 renderMatches();
 renderOpponents();
 renderVideos();
+
+// Restore last tab
+try {
+    const saved = localStorage.getItem('jacpa-portal-tab');
+    if (saved && document.getElementById('tab-' + saved)) switchTab(saved);
+} catch(e) {}
 </script>
 
 <!-- Roster Modal -->
