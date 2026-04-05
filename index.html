@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JACPA東京FC 2025年4月入団学年 チームサイト</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -534,24 +537,31 @@
             font-weight: 700;
             color: white;
         }
-        .p-card { position: relative; cursor: pointer; transition: transform 0.15s; }
-        .p-card:active { transform: scale(0.97); }
+        .p-card { position: relative; }
         .p-label-u9 { background: var(--green); }
         .p-label-u8 { background: #e67e22; }
         .p-label-u10 { background: #3498db; }
 
-        /* Roster Modal */
+        /* Modal */
         .roster-modal {
-            display: none; position: fixed; top: 0; left: 0;
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 1000;
-            justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
         }
         .roster-modal.active { display: flex; }
         .roster-modal-content {
-            display: flex; flex-direction: column;
-            background: #fff; border-radius: 16px; overflow: hidden;
-            max-width: 500px; max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            max-width: 500px;
+            max-height: 90vh;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
             animation: rosterModalIn 0.3s ease;
         }
@@ -560,19 +570,27 @@
             to { opacity: 1; transform: scale(1); }
         }
         .roster-modal-image {
-            width: 100%; max-height: 60vh;
-            object-fit: cover; object-position: top;
+            width: 100%;
+            max-height: 60vh;
+            object-fit: cover;
+            object-position: top;
         }
         .roster-modal-image.crop-left { object-position: left top; }
         .roster-modal-info {
-            padding: 25px 30px; display: flex; align-items: center; gap: 20px;
+            padding: 25px 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
             background: linear-gradient(135deg, #fafafa 0%, #fff 100%);
             border-top: 4px solid var(--green);
         }
         .roster-modal-number {
-            font-size: 72px; font-weight: 900; color: #1a1a1a;
+            font-size: 72px;
+            font-weight: 900;
+            color: #1a1a1a;
             font-family: Impact, 'Helvetica Neue', sans-serif;
-            transform: skewX(-10deg); line-height: 1;
+            transform: skewX(-10deg);
+            line-height: 1;
             text-shadow: 3px 3px 0 var(--green);
         }
         .roster-modal-name-area { flex: 1; }
@@ -580,25 +598,33 @@
         .roster-modal-name-romaji { font-size: 14px; color: #666; text-transform: uppercase; margin-top: 5px; }
         .roster-modal-role { font-size: 16px; color: #666; margin-bottom: 5px; }
         .roster-modal-close {
-            position: absolute; top: 15px; right: 15px;
+            position: absolute;
+            top: 15px; right: 15px;
             width: 36px; height: 36px;
-            background: rgba(0,0,0,0.5); border: none; border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            border: none; border-radius: 50%;
             font-size: 20px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             color: #fff; transition: background 0.2s;
         }
         .roster-modal-close:hover { background: rgba(0,0,0,0.7); }
         .roster-modal-nav {
-            position: absolute; top: 50%; transform: translateY(-50%);
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
             width: 50px; height: 50px;
-            background: rgba(255,255,255,0.9); border: none; border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            border: none; border-radius: 50%;
             font-size: 24px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            color: #333; transition: background 0.2s, transform 0.2s;
+            color: #333;
+            transition: background 0.2s, transform 0.2s;
         }
         .roster-modal-nav:hover { background: #fff; transform: translateY(-50%) scale(1.1); }
         .roster-modal-prev { left: 20px; }
         .roster-modal-next { right: 20px; }
+        .p-card { cursor: pointer; transition: transform 0.15s; }
+        .p-card:active { transform: scale(0.97); }
 
         /* Staff cards */
         .staff-grid {
@@ -639,6 +665,9 @@
     <div class="tab" onclick="switchTab('history')">
         <span class="tab-icon">&#128214;</span>History
     </div>
+    <div class="tab" onclick="switchTab('message')">
+        <span class="tab-icon">&#9998;</span>監督より
+    </div>
     <!-- 会場タブ（データ準備中）
     <div class="tab" onclick="switchTab('venues')">
         <span class="tab-icon">&#128205;</span>会場
@@ -660,21 +689,17 @@
 
         <div class="section-title">直近の試合</div>
         <div id="home-recent"></div>
-
-        <div style="text-align:center;margin-top:40px;padding:20px 0;font-size:11px;color:#bbb;">
-            v1.2.0 — 2026.3.30 更新
-        </div>
     </div>
 
     <!-- ROSTER TAB -->
     <div id="tab-roster" class="tab-content">
-        <div style="text-align:center;margin-bottom:16px;padding-top:4px;">
-            <a href="https://ssaito-spec.github.io/jacpa-team/quiz.html" target="_blank" style="display:inline-block;padding:14px 40px;background:var(--green);color:white;text-decoration:none;border-radius:30px;font-size:15px;font-weight:700;transition:background 0.2s;">クイズでチームメイトを覚えよう！</a>
-        </div>
         <div class="section-title">STAFF</div>
         <div id="staff-grid" class="staff-grid"></div>
         <div class="section-title">PLAYERS</div>
         <div id="roster-grid" class="player-grid"></div>
+        <div style="text-align:center;margin-top:30px;padding-bottom:20px;">
+            <a href="https://ssaito-spec.github.io/jacpa-team/quiz.html" target="_blank" style="display:inline-block;padding:14px 40px;background:var(--green);color:white;text-decoration:none;border-radius:30px;font-size:15px;font-weight:700;transition:background 0.2s;">クイズに挑戦！</a>
+        </div>
     </div>
 
     <!-- PLAYER TAB -->
@@ -692,6 +717,73 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
             慧パパに修正依頼
         </a>
+    </div>
+
+    <!-- MESSAGE TAB -->
+    <div id="tab-message" class="tab-content">
+        <div style="max-width:480px;margin:0 auto;padding:20px 16px;">
+            <div style="text-align:center;margin-bottom:28px;">
+                <div style="font-size:11px;color:#999;letter-spacing:2px;margin-bottom:4px;">2026年4月 総会より</div>
+                <div style="font-family:'Zen Old Mincho','Noto Serif JP',serif;font-size:26px;font-weight:700;color:#1a1a1a;letter-spacing:4px;">監督より</div>
+                <div style="width:40px;height:2px;background:#1a1a1a;margin:12px auto 0;"></div>
+            </div>
+
+            <div style="background:white;border-radius:16px;padding:28px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:20px;border-left:3px solid var(--green);">
+                <div style="font-family:'Zen Old Mincho','Noto Serif JP',serif;font-size:15px;line-height:2.0;color:#2a2a2a;text-align:justify;">
+                    何度考えても、昔だろうが今だろうが、<br>
+                    人に物を尋ねるとき、<strong>自分の名前を言おう。</strong><br><br>
+                    その人と目を向いて向き合って、<br>
+                    文章や文字じゃなくて、<br>
+                    <strong>皆さんの声で発信してほしい。</strong>
+                </div>
+            </div>
+
+            <div style="background:white;border-radius:16px;padding:28px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:20px;">
+                <div style="font-family:'Zen Old Mincho','Noto Serif JP',serif;font-size:13px;font-weight:700;color:var(--green);margin-bottom:16px;letter-spacing:2px;">コミュニケーションの原則</div>
+                <div style="font-family:'Zen Old Mincho','Noto Serif JP',serif;font-size:14px;line-height:2.0;color:#333;">
+                    選手を預けるということは、<br>
+                    JACPAとそのスタッフを<br>
+                    信頼して自分で選んだということ。<br><br>
+                    すべては<strong>選手のため。</strong><br><br>
+                    何か伝えたいことがあるなら、<br>
+                    必ず名前を名乗り、<br>
+                    直接顔を合わせて対話すること。<br><br>
+                    匿名の文面や<br>
+                    間接的な伝達は受け付けない。
+                </div>
+            </div>
+
+            <div style="background:white;border-radius:16px;padding:28px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:20px;">
+                <div style="font-family:'Zen Old Mincho','Noto Serif JP',serif;font-size:13px;font-weight:700;color:var(--green);margin-bottom:16px;letter-spacing:2px;">三位一体</div>
+                <div style="font-family:'Zen Old Mincho','Noto Serif JP',serif;font-size:14px;line-height:2.0;color:#333;">
+                    選手、保護者、スタッフ。<br><br>
+                    この三つが一つになって<br>
+                    目標に向かって進んでいく。<br><br>
+                    日々の送迎、遠征の応援、<br>
+                    無理のない範囲で構わない。<br>
+                    みんなで一緒に<br>
+                    子どもたちを育てていく。
+                </div>
+            </div>
+
+            <div style="background:white;border-radius:16px;padding:28px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:20px;border-left:3px solid var(--orange);">
+                <div style="font-family:'Zen Old Mincho','Noto Serif JP',serif;font-size:13px;font-weight:700;color:var(--orange);margin-bottom:16px;letter-spacing:2px;">目標</div>
+                <div style="font-family:'Zen Old Mincho','Noto Serif JP',serif;font-size:18px;line-height:2.0;color:#1a1a1a;text-align:center;font-weight:700;">
+                    日本一。
+                </div>
+                <div style="font-family:'Zen Old Mincho','Noto Serif JP',serif;font-size:13px;line-height:1.9;color:#666;margin-top:12px;text-align:center;">
+                    約9,000チームの頂点。<br>
+                    簡単なことじゃない。<br>
+                    でも目指すということは良いこと。
+                </div>
+            </div>
+
+            <div style="text-align:center;margin-top:32px;padding:16px;">
+                <div style="font-family:'Zen Old Mincho','Noto Serif JP',serif;font-size:12px;color:#aaa;letter-spacing:1px;">
+                    JACPA東京FC<br>監督 野口
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- HISTORY TAB -->
@@ -1643,7 +1735,7 @@ function computePlayerStats(playerNum) {
 // ========== TAB SWITCHING ==========
 function switchTab(tabName) {
     document.querySelectorAll('.tab').forEach((t, i) => {
-        t.classList.toggle('active', ['home','roster','matches','videos','player','history','venues'][i] === tabName);
+        t.classList.toggle('active', ['home','roster','matches','videos','player','history','message','venues'][i] === tabName);
     });
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById('tab-' + tabName).classList.add('active');
@@ -1729,7 +1821,7 @@ function renderHome() {
 function renderPlayerSelector() {
     const select = document.getElementById('player-select');
     const sorted = Object.entries(PLAYERS)
-        .filter(([num]) => !["13","39","99"].includes(num))
+        .filter(([num]) => num !== "39" && num !== "99")
         .sort((a,b) => Number(a[0]) - Number(b[0]));
     sorted.forEach(([num, p]) => {
         const opt = document.createElement('option');
@@ -2199,7 +2291,7 @@ function showMatchView(view) {
 }
 
 // ========== SWIPE NAVIGATION ==========
-const TAB_ORDER = ['home','roster','matches','videos','player','history'];
+const TAB_ORDER = ['home','roster','matches','videos','player','history','message'];
 let touchStartX = 0;
 let touchStartY = 0;
 
@@ -2261,7 +2353,7 @@ const rosterModal = document.getElementById('roster-modal');
 let rosterMembers = [];
 let rosterCurrentIndex = 0;
 
-(function buildRosterMembers() {
+function buildRosterMembers() {
     rosterMembers = [
         { image: IMG_BASE + '野口監督_trimmed.jpg', number: '', name: '野口監督', romaji: '', role: '監督', cropLeft: true },
         { image: IMG_BASE + 'その他/川﨑コーチ.jpg', number: '', name: '川﨑コーチ', romaji: '', role: 'コーチ', cropLeft: false }
@@ -2272,22 +2364,27 @@ let rosterCurrentIndex = 0;
         .forEach(([num, p]) => {
             rosterMembers.push({
                 image: IMG_BASE + '選手紹介用/' + PLAYER_IMAGES[num],
-                number: num, name: p.name, romaji: p.romaji, role: '', cropLeft: false
+                number: num,
+                name: p.name,
+                romaji: p.romaji,
+                role: '',
+                cropLeft: false
             });
         });
-})();
+}
+buildRosterMembers();
 
 function showRosterMember(index) {
     const m = rosterMembers[index];
     const img = document.getElementById('roster-modal-image');
     img.src = m.image;
     if (m.cropLeft) img.classList.add('crop-left'); else img.classList.remove('crop-left');
-    const numEl = document.getElementById('roster-modal-number');
-    numEl.textContent = m.number; numEl.style.display = m.number ? 'block' : 'none';
+    document.getElementById('roster-modal-number').textContent = m.number;
+    document.getElementById('roster-modal-number').style.display = m.number ? 'block' : 'none';
     document.getElementById('roster-modal-name-kanji').textContent = m.name;
     document.getElementById('roster-modal-name-romaji').textContent = m.romaji;
-    const roleEl = document.getElementById('roster-modal-role');
-    roleEl.textContent = m.role; roleEl.style.display = m.role ? 'block' : 'none';
+    document.getElementById('roster-modal-role').textContent = m.role;
+    document.getElementById('roster-modal-role').style.display = m.role ? 'block' : 'none';
 }
 
 function openRosterModal(imageSrc) {
@@ -2296,6 +2393,7 @@ function openRosterModal(imageSrc) {
     showRosterMember(rosterCurrentIndex);
     rosterModal.classList.add('active');
 }
+
 function closeRosterModal() { rosterModal.classList.remove('active'); }
 function nextRosterMember() { rosterCurrentIndex = (rosterCurrentIndex + 1) % rosterMembers.length; showRosterMember(rosterCurrentIndex); }
 function prevRosterMember() { rosterCurrentIndex = (rosterCurrentIndex - 1 + rosterMembers.length) % rosterMembers.length; showRosterMember(rosterCurrentIndex); }
