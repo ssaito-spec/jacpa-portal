@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JACPA東京FC 2025年4月入団学年 チームサイト</title>
+    <title>JACPA東京FC 2026年度 (U10) チームサイト</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
@@ -634,6 +634,39 @@
             max-width: 320px;
             margin-bottom: 20px;
         }
+
+        /* Season sub-tabs */
+        .season-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            background: #fafafa;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 6px 16px;
+            position: sticky;
+            top: 112px;
+            z-index: 98;
+        }
+        .season-tab {
+            padding: 5px 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #888;
+            cursor: pointer;
+            border-radius: 16px;
+            border: 1.5px solid #ddd;
+            background: white;
+            transition: all 0.2s;
+        }
+        .season-tab.active {
+            color: white;
+            background: var(--green);
+            border-color: var(--green);
+        }
+        .season-tab:hover:not(.active) {
+            border-color: var(--green);
+            color: var(--green);
+        }
     </style>
 </head>
 <body>
@@ -642,7 +675,7 @@
     <img src="https://ssaito-spec.github.io/jacpa-team/その他/logo.jpeg" alt="JACPA東京FC">
     <div class="header-text">
         <h1>JACPA東京FC</h1>
-        <div class="season">2025年4月入団メンバー チームサイト</div>
+        <div class="season" id="header-season">2026年度 (U10) チームサイト</div>
     </div>
 </div>
 
@@ -675,11 +708,16 @@
     -->
 </div>
 
+<div class="season-tabs">
+    <div class="season-tab active" onclick="switchSeason('u10')">U10</div>
+    <div class="season-tab" onclick="switchSeason('u9')">U9</div>
+</div>
+
 <div style="text-align:center;padding:6px;background:#fff3e0;font-size:10px;color:#e65100;font-weight:600;">関係者限定公開 — URLの外部共有はご遠慮ください</div>
 <div class="content">
     <!-- HOME TAB -->
     <div id="tab-home" class="tab-content active">
-        <div class="section-title">シーズン成績（2025年度 / U9）</div>
+        <div class="section-title" id="home-season-title">シーズン成績（2026年度 / U10）</div>
         <div id="home-stats" class="stats-grid"></div>
         <div id="home-record-bar" class="record-bar"></div>
         <div id="home-record-text" style="font-size:12px;color:#888;text-align:center;margin-bottom:20px;"></div>
@@ -775,8 +813,8 @@
     <!-- HISTORY TAB -->
     <div id="tab-history" class="tab-content">
         <div style="text-align:center;margin-bottom:20px;">
-            <div style="font-size:22px;font-weight:900;color:#1a1a1a;">U9の1年間</div>
-            <div style="font-size:12px;color:#888;">2025年3月 — 2026年3月</div>
+            <div style="font-size:22px;font-weight:900;color:#1a1a1a;" id="history-title">U10の1年間</div>
+            <div style="font-size:12px;color:#888;" id="history-subtitle">2026年4月 — 2027年3月</div>
         </div>
         <div class="timeline" id="timeline-content"></div>
     </div>
@@ -824,13 +862,20 @@
 
 <div class="footer">
     <div style="background:#fff3e0;color:#e65100;padding:8px 16px;border-radius:8px;font-size:11px;font-weight:600;margin-bottom:12px;display:inline-block;">このサイトは関係者限定公開です。URLの外部共有はご遠慮ください。</div>
-    <div>JACPA東京FC 2025年4月入団メンバー チームサイト</div>
-    <div style="font-size:10px;color:#bbb;margin-top:8px;">v2.2.0 — 2026.04.12</div>
+    <div id="footer-text">JACPA東京FC 2026年度 (U10) チームサイト</div>
+    <div style="font-size:10px;color:#bbb;margin-top:8px;">v3.0.0 — 2026.04.12</div>
 </div>
 
 <script>
+// ========== SEASON STATE ==========
+let currentSeason = 'u10';
+
+function getMatchDays() { return currentSeason === 'u9' ? MATCH_DAYS_U9 : MATCH_DAYS_U10; }
+function getPlayers() { return currentSeason === 'u9' ? PLAYERS_U9 : PLAYERS_U10; }
+function getVideos() { return currentSeason === 'u9' ? ALL_VIDEOS_U9 : ALL_VIDEOS_U10; }
+
 // ========== PLAYER DATABASE ==========
-const PLAYERS = {
+const PLAYERS_U9 = {
     2: { name: "優聖", romaji: "Yusei", age: "U9" },
     3: { name: "旺佑", romaji: "Osuke", age: "U9" },
     4: { name: "一翔", romaji: "Kazuto", age: "U9" },
@@ -860,9 +905,37 @@ const PLAYERS = {
     73: { name: "繁晴", romaji: "Shigeharu", age: "U9" }
 };
 
+const PLAYERS_U10 = {
+    2: { name: "優聖", romaji: "Yusei", age: "U10" },
+    3: { name: "旺佑", romaji: "Osuke", age: "U10" },
+    4: { name: "一翔", romaji: "Kazuto", age: "U10" },
+    5: { name: "正斗", romaji: "Masato", age: "U10(U11帯同)" },
+    8: { name: "葵", romaji: "Aoi", age: "U9" },
+    9: { name: "琉真", romaji: "Rihito", age: "U10" },
+    10: { name: "雅空", romaji: "Gaku", age: "U10" },
+    11: { name: "陸", romaji: "Riku", age: "U10" },
+    14: { name: "倭", romaji: "Yamato", age: "U10" },
+    15: { name: "冬悟", romaji: "Togo", age: "U10" },
+    16: { name: "秋実", romaji: "Ami", age: "U10" },
+    17: { name: "慧", romaji: "Kei", age: "U10" },
+    18: { name: "風雅", romaji: "Fuga", age: "U10" },
+    19: { name: "陽太", romaji: "Yota", age: "U10" },
+    20: { name: "慎士郎", romaji: "Shinjiro", age: "U9" },
+    22: { name: "爽汰", romaji: "Sota", age: "U10" },
+    23: { name: "惺渚", romaji: "Sena", age: "U10" },
+    24: { name: "蒼之", romaji: "Soshi", age: "U10" },
+    13: { name: "#13", romaji: "", age: "U10" },
+    25: { name: "陸(加藤)", romaji: "Riku K.", age: "U10" },
+    29: { name: "正雄", romaji: "Masao", age: "U10" },
+    30: { name: "裕史", romaji: "Yuushi", age: "U10" },
+    39: { name: "#39", romaji: "", age: "" },
+    65: { name: "凌雅", romaji: "Ryoga", age: "U10" },
+    73: { name: "繁晴", romaji: "Shigeharu", age: "U10" }
+};
+
 // ========== MATCH DATA ==========
 // p: all players, g: GK numbers, s: [us, them], sc: scorers, r: W/L/D
-const MATCH_DAYS = [
+const MATCH_DAYS_U9 = [
     {
         date: "2025-04-12", title: "TM vs 上尾朝日（初試合）", type: "tm",
         venue: "上谷総合公園人工芝G", weather: "", staff: [],
@@ -1539,8 +1612,31 @@ const MATCH_DAYS = [
     }
 ];
 
+const MATCH_DAYS_U10 = [
+    {
+        date: "2026-04-11", title: "TM vs 1FC川越水上公園", type: "tm",
+        venue: "狭山グラウンド", weather: "", staff: [],
+        videos: [],
+        note: "U10初試合。12試合TM",
+        games: [
+            { n:1, o:"1FC川越水上公園", t:"tm", p:[2,3,5,8,23,25,29], g:[11], s:[0,1], sc:[], r:"L", detail:"[2,3,5,8,23,25,29]GK11" },
+            { n:2, o:"1FC川越水上公園", t:"tm", p:[4,17,20,22,30,65,73], g:[9], s:[0,0], sc:[], r:"D", detail:"[4,17,20,22,30,65,73]GK9" },
+            { n:3, o:"1FC川越水上公園", t:"tm", p:[9,10,11,14,16,19,24], g:[4], s:[0,0], sc:[], r:"D", detail:"[9,10,11,14,16,19,24]GK4" },
+            { n:4, o:"1FC川越水上公園", t:"tm", p:[3,9,11,15,18,24,25], g:[10], s:[0,0], sc:[], r:"D", detail:"[3,9,11,15,18,24,25]GK10" },
+            { n:5, o:"1FC川越水上公園", t:"tm", p:[4,20,22,23,29,30,65], g:[17], s:[4,2], sc:[29,29,30,30], r:"W", detail:"[4,20,22,23,29,30,65]GK17" },
+            { n:6, o:"1FC川越水上公園", t:"tm", p:[5,8,17,20,22,30,73], g:[65], s:[0,0], sc:[], r:"D", detail:"[5,8,17,20,22,30,73]GK65" },
+            { n:7, o:"1FC川越水上公園", t:"tm", p:[2,10,14,15,16,18,19], g:[3], s:[1,0], sc:[2], r:"W", detail:"[2,10,14,15,16,18,19]GK3" },
+            { n:8, o:"1FC川越水上公園", t:"tm", p:[3,9,11,16,19,24,25], g:[20], s:[2,0], sc:[3,19], r:"W", detail:"[3,9,11,16,19,24,25]GK20" },
+            { n:9, o:"1FC川越水上公園", t:"tm", p:[4,5,8,17,23,29,73], g:[25], s:[3,0], sc:[5,5,23], r:"W", detail:"[4,5,8,17,23,29,73]GK25" },
+            { n:10, o:"1FC川越水上公園", t:"tm", p:[4,17,20,22,30,65,73], g:[5], s:[0,0], sc:[], r:"D", detail:"[4,17,20,22,30,65,73→23,29]GK5" },
+            { n:11, o:"1FC川越水上公園", t:"tm", p:[2,3,9,10,11,15,25], g:[18], s:[2,0], sc:[10,11], r:"W", detail:"[2,3,9,10,11,15,25]GK18" },
+            { n:12, o:"1FC川越水上公園", t:"tm", p:[10,14,15,16,18,19,24], g:[73], s:[3,0], sc:[10,16,18], r:"W", detail:"[10,14,15,16,18,19,24]GK73" }
+        ]
+    }
+];
+
 // ========== VIDEO LINKS (all, including ones without match data) ==========
-const ALL_VIDEOS = [
+const ALL_VIDEOS_U9 = [
     { date:"2025-04-12", title:"TM@上谷総合公園", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9XNeU1JQP2oyjdKSSnwVPtM" },
     { date:"2025-04-19", title:"トリアネーロカップ", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9WfTrNuMSJg33PyKlqS2OUA" },
     { date:"2025-04-27", title:"TM レイソルTOR", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9V4tYOVX2_7r0UtaPZ_6ww7" },
@@ -1576,10 +1672,12 @@ const ALL_VIDEOS = [
     { date:"2026-03-22", title:"TM（レイソルTOR）", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9XknDOYYeKgGmyDWSBv4yOf" }
 ];
 
+const ALL_VIDEOS_U10 = [];
+
 // ========== UTILITY FUNCTIONS ==========
 function playerName(num) {
     if (num === 99) return "新人";
-    const p = PLAYERS[num];
+    const p = getPlayers()[num];
     return p ? p.name : "#" + num;
 }
 
@@ -1685,21 +1783,22 @@ function getGameVideoUrl(matchDay, gameNum) {
 // ========== STATS COMPUTATION ==========
 function computeTeamStats() {
     let w=0, d=0, l=0, gf=0, ga=0, games=0;
-    MATCH_DAYS.forEach(md => {
+    const matchDays = getMatchDays();
+    matchDays.forEach(md => {
         md.games.forEach(g => {
             games++;
             gf += g.s[0]; ga += g.s[1];
             if (g.r==="W") w++; else if (g.r==="D") d++; else l++;
         });
     });
-    return { w, d, l, gf, ga, games, matchDays: MATCH_DAYS.length };
+    return { w, d, l, gf, ga, games, matchDays: matchDays.length };
 }
 
 function computePlayerStats(playerNum) {
     let appearances=0, goals=0, gkGames=0, wins=0, draws=0, losses=0;
     const matchList = [];
 
-    MATCH_DAYS.forEach(md => {
+    getMatchDays().forEach(md => {
         const playerGames = [];
         md.games.forEach(g => {
             if (g.p.includes(playerNum)) {
@@ -1731,6 +1830,35 @@ function switchTab(tabName) {
     try { localStorage.setItem('jacpa-portal-tab', tabName); } catch(e) {}
 }
 
+function switchSeason(season) {
+    currentSeason = season;
+    document.querySelectorAll('.season-tab').forEach(t => {
+        t.classList.toggle('active', t.textContent.toLowerCase() === season);
+    });
+    // Update header, title, footer
+    const isU10 = season === 'u10';
+    document.getElementById('header-season').textContent = isU10 ? '2026年度 (U10) チームサイト' : '2025年度 (U9) チームサイト';
+    document.title = isU10 ? 'JACPA東京FC 2026年度 (U10) チームサイト' : 'JACPA東京FC 2025年度 (U9) チームサイト';
+    document.getElementById('footer-text').textContent = isU10 ? 'JACPA東京FC 2026年度 (U10) チームサイト' : 'JACPA東京FC 2025年度 (U9) チームサイト';
+    document.getElementById('home-season-title').textContent = isU10 ? 'シーズン成績（2026年度 / U10）' : 'シーズン成績（2025年度 / U9）';
+    document.getElementById('history-title').textContent = isU10 ? 'U10の1年間' : 'U9の1年間';
+    document.getElementById('history-subtitle').textContent = isU10 ? '2026年4月 — 2027年3月' : '2025年3月 — 2026年3月';
+    // Re-sort match data
+    getMatchDays().sort((a, b) => a.date.localeCompare(b.date));
+    // Re-render all tabs
+    renderHome();
+    renderRoster();
+    renderHistory();
+    renderVenues();
+    renderTimeline();
+    renderPlayerSelector();
+    renderPlayerView();
+    renderMatches();
+    renderOpponents();
+    renderVideos();
+    try { localStorage.setItem('jacpa-portal-season', season); } catch(e) {}
+}
+
 function sendReport(e) {
     e.preventDefault();
     const sel = document.getElementById('player-select');
@@ -1760,7 +1888,7 @@ function renderHome() {
         `${stats.w}勝 ${stats.d}分 ${stats.l}敗（勝率 ${(stats.w/total*100).toFixed(1)}%）/ 得失点 ${stats.gf}-${stats.ga}（${stats.gf-stats.ga>=0?"+":""}${stats.gf-stats.ga}）`;
 
     // Recent matches (last 3) - same format as matches tab
-    const recent = [...MATCH_DAYS].reverse().slice(0, 3);
+    const recent = [...getMatchDays()].reverse().slice(0, 3);
     document.getElementById('home-recent').innerHTML = recent.map(md => {
         const w = md.games.filter(g=>g.r==="W").length;
         const d = md.games.filter(g=>g.r==="D").length;
@@ -1808,8 +1936,14 @@ function renderHome() {
 // ========== RENDER PLAYER SELECTOR ==========
 function renderPlayerSelector() {
     const select = document.getElementById('player-select');
-    const sorted = Object.entries(PLAYERS)
-        .filter(([num]) => num !== "39" && num !== "99")
+    const currentVal = select.value;
+    // Clear existing options except the default
+    select.innerHTML = '<option value="">-- 選択 --</option>';
+    const players = getPlayers();
+    const excludeNums = ['13', '39', '99'];
+    if (currentSeason === 'u10') excludeNums.push('6', '28');
+    const sorted = Object.entries(players)
+        .filter(([num]) => !excludeNums.includes(num))
         .sort((a,b) => Number(a[0]) - Number(b[0]));
     sorted.forEach(([num, p]) => {
         const opt = document.createElement('option');
@@ -1817,6 +1951,10 @@ function renderPlayerSelector() {
         opt.textContent = `#${num} ${p.name}`;
         select.appendChild(opt);
     });
+    // Restore selection if still valid
+    if (currentVal && select.querySelector(`option[value="${currentVal}"]`)) {
+        select.value = currentVal;
+    }
 }
 
 // ========== RENDER PLAYER VIEW ==========
@@ -1895,7 +2033,7 @@ function renderPlayerView() {
 // ========== RENDER ALL MATCHES ==========
 function renderMatches() {
     const list = document.getElementById('matches-list');
-    list.innerHTML = MATCH_DAYS.map(md => {
+    list.innerHTML = getMatchDays().map(md => {
         const w = md.games.filter(g=>g.r==="W").length;
         const d = md.games.filter(g=>g.r==="D").length;
         const l = md.games.filter(g=>g.r==="L").length;
@@ -1949,8 +2087,13 @@ function renderMatches() {
 // ========== RENDER VIDEOS ==========
 function renderVideos() {
     const list = document.getElementById('videos-list');
+    const videos = getVideos();
+    if (videos.length === 0) {
+        list.innerHTML = '<div class="no-data">動画はまだありません</div>';
+        return;
+    }
     // 古い順（時系列順）で表示
-    const sorted = [...ALL_VIDEOS].sort((a,b) => a.date.localeCompare(b.date));
+    const sorted = [...videos].sort((a,b) => a.date.localeCompare(b.date));
     list.innerHTML = sorted.map(v => {
         return `<div class="video-card">
             <div class="v-date">${formatDate(v.date)}</div>
@@ -1962,7 +2105,14 @@ function renderVideos() {
 
 // ========== RENDER HISTORY ==========
 function renderHistory() {
-    const timeline = [
+    const timelineU10 = [
+        { chapter: "第1章：U10始動" },
+        { month: "4月", year: "2026" },
+        { title:"U10初試合 vs 1FC川越水上公園", cls:"highlight",
+          body:"狭山グラウンドにて12試合TM。6勝5分1敗。新メンバーも含め全員出場。新シーズンの幕開け。" },
+    ];
+
+    const timelineU9 = [
         { chapter: "第1章：始動" },
         { month: "3月", year: "2025" },
         { title:"チーム発足・顔合わせ", cls:"highlight",
@@ -2056,6 +2206,8 @@ function renderHistory() {
           body:"3年生にブラジル体操を教える側に。1年前、何もできなかった選手たちが後輩を指導する姿に成長を実感。" },
     ];
 
+    const timeline = currentSeason === 'u10' ? timelineU10 : timelineU9;
+
     document.getElementById('timeline-content').innerHTML = timeline.map(item => {
         if (item.chapter) return `<div class="tl-chapter">${item.chapter}</div>`;
         if (item.month) return `<div class="tl-month">${item.year}年${item.month}</div>`;
@@ -2070,7 +2222,7 @@ function renderHistory() {
 // ========== RENDER VENUES ==========
 function renderVenues() {
     const venueMap = {};
-    MATCH_DAYS.forEach(md => {
+    getMatchDays().forEach(md => {
         if (!md.venue) return;
         if (!venueMap[md.venue]) venueMap[md.venue] = [];
         venueMap[md.venue].push({ date: md.date, title: md.title });
@@ -2107,6 +2259,7 @@ const PLAYER_IMAGES = {
 const IMG_BASE = 'https://ssaito-spec.github.io/jacpa-team/';
 
 function renderRoster() {
+    buildRosterMembers();
     // Staff
     document.getElementById('staff-grid').innerHTML = [
         { name:'野口監督', role:'監督', img:'野口監督_trimmed.jpg' },
@@ -2120,13 +2273,15 @@ function renderRoster() {
     </div>`).join('');
 
     // Players
-    const rosterPlayers = Object.entries(PLAYERS)
-        .filter(([n]) => !['13','39','99'].includes(n))
+    const excludeNums = ['13','39','99'];
+    if (currentSeason === 'u10') { excludeNums.push('6','28'); }
+    const rosterPlayers = Object.entries(getPlayers())
+        .filter(([n]) => !excludeNums.includes(n))
         .sort((a,b) => Number(a[0]) - Number(b[0]));
     document.getElementById('roster-grid').innerHTML = rosterPlayers.map(([num, p]) => {
         const hasPhoto = PLAYER_IMAGES[num];
-        const labelClass = p.age.includes('U8') ? 'p-label-u8' : p.age.includes('U10') ? 'p-label-u10' : 'p-label-u9';
-        const labelText = p.age.includes('U10') ? 'U10帯同' : p.age.includes('U8') ? 'U8' : 'U9';
+        const labelClass = p.age.includes('U8') ? 'p-label-u8' : p.age.includes('U11') ? 'p-label-u10' : p.age.includes('U10') && currentSeason === 'u9' ? 'p-label-u10' : p.age.includes('U9') && currentSeason === 'u10' ? 'p-label-u8' : 'p-label-u9';
+        const labelText = p.age.includes('U11') ? 'U11帯同' : p.age.includes('U10') && currentSeason === 'u9' ? 'U10帯同' : p.age.includes('U8') ? 'U8' : p.age.includes('U9') && currentSeason === 'u10' ? 'U9' : currentSeason === 'u10' ? 'U10' : 'U9';
         const imgHtml = hasPhoto
             ? `<img src="${IMG_BASE}選手紹介用/${PLAYER_IMAGES[num]}" alt="${p.name}">`
             : `<div style="width:100%;aspect-ratio:3/4;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:12px;font-weight:600;">Coming Soon</div>`;
@@ -2146,7 +2301,7 @@ function renderRoster() {
 // ========== RENDER TIMELINE ==========
 function renderTimeline() {
     const monthly = {};
-    MATCH_DAYS.forEach(md => {
+    getMatchDays().forEach(md => {
         const key = md.date.substring(0, 7); // "2025-04"
         if (!monthly[key]) monthly[key] = { w:0, d:0, l:0 };
         md.games.forEach(g => {
@@ -2191,7 +2346,7 @@ function renderTournaments() {
     ];
 
     const html = tournamentDefs.map(td => {
-        const mds = MATCH_DAYS.filter(md => td.matchFilter(md.title));
+        const mds = getMatchDays().filter(md => td.matchFilter(md.title));
         if (mds.length === 0) return '';
         let w=0, d=0, l=0, gf=0, ga=0;
         const officialOnly = [];
@@ -2226,7 +2381,7 @@ function renderTournaments() {
 // ========== OPPONENT HISTORY ==========
 function renderOpponents() {
     const opps = {};
-    MATCH_DAYS.forEach(md => {
+    getMatchDays().forEach(md => {
         md.games.forEach(g => {
             const name = g.o.replace(/^vs\s*/, '').trim();
             if (!opps[name]) opps[name] = { w:0, d:0, l:0, gf:0, ga:0, dates:[] };
@@ -2304,17 +2459,19 @@ document.addEventListener('touchend', e => {
 }, { passive: true });
 
 // ========== INIT ==========
-MATCH_DAYS.sort((a, b) => a.date.localeCompare(b.date));
-renderHome();
-renderRoster();
-renderHistory();
-renderVenues();
-renderTimeline();
-renderPlayerSelector();
-renderPlayerView();
-renderMatches();
-renderOpponents();
-renderVideos();
+MATCH_DAYS_U9.sort((a, b) => a.date.localeCompare(b.date));
+MATCH_DAYS_U10.sort((a, b) => a.date.localeCompare(b.date));
+
+// Restore saved season
+try {
+    const savedSeason = localStorage.getItem('jacpa-portal-season');
+    if (savedSeason && (savedSeason === 'u9' || savedSeason === 'u10')) {
+        currentSeason = savedSeason;
+    }
+} catch(e) {}
+
+// Apply season state to UI
+switchSeason(currentSeason);
 
 // Restore last tab
 try {
@@ -2352,8 +2509,10 @@ function buildRosterMembers() {
         { image: IMG_BASE + '野口監督_trimmed.jpg', number: '', name: '野口監督', romaji: '', role: '監督', cropLeft: true },
         { image: IMG_BASE + 'その他/川﨑コーチ.jpg', number: '', name: '川﨑コーチ', romaji: '', role: 'コーチ', cropLeft: false }
     ];
-    Object.entries(PLAYERS)
-        .filter(([n]) => !['13','39','99'].includes(n) && PLAYER_IMAGES[n])
+    const excludeNums = ['13','39','99'];
+    if (currentSeason === 'u10') { excludeNums.push('6','28'); }
+    Object.entries(getPlayers())
+        .filter(([n]) => !excludeNums.includes(n) && PLAYER_IMAGES[n])
         .sort((a,b) => Number(a[0]) - Number(b[0]))
         .forEach(([num, p]) => {
             rosterMembers.push({
