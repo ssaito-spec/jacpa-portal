@@ -50,10 +50,11 @@
         }
         .tab {
             flex: 1;
-            padding: 12px 8px;
+            padding: 12px 4px;
             text-align: center;
-            font-size: 13px;
+            font-size: 10px;
             font-weight: 600;
+            white-space: nowrap;
             color: #888;
             cursor: pointer;
             border-bottom: 3px solid transparent;
@@ -2276,6 +2277,29 @@ const PLAYER_IMAGES = {
     24:'1773492977778.jpg', 28:'1773492978418.jpg', 65:'1773492979006.jpg'
 };
 const IMG_BASE = 'https://ssaito-spec.github.io/jacpa-team/';
+let rosterMembers = [];
+
+function buildRosterMembers() {
+    rosterMembers = [
+        { image: IMG_BASE + '野口監督_trimmed.jpg', number: '', name: '野口監督', romaji: '', role: '監督', cropLeft: true },
+        { image: IMG_BASE + 'その他/川﨑コーチ.jpg', number: '', name: '川﨑コーチ', romaji: '', role: 'コーチ', cropLeft: false }
+    ];
+    const excludeNums = ['13','39','99'];
+    if (currentSeason === 'u10') { excludeNums.push('6','28'); }
+    Object.entries(getPlayers())
+        .filter(([n]) => !excludeNums.includes(n) && PLAYER_IMAGES[n])
+        .sort((a,b) => Number(a[0]) - Number(b[0]))
+        .forEach(([num, p]) => {
+            rosterMembers.push({
+                image: IMG_BASE + '選手紹介用/' + PLAYER_IMAGES[num],
+                number: num,
+                name: p.name,
+                romaji: p.romaji,
+                role: '',
+                cropLeft: false
+            });
+        });
+}
 
 function renderRoster() {
     buildRosterMembers();
@@ -2520,30 +2544,9 @@ try {
 <script>
 // ========== ROSTER MODAL ==========
 const rosterModal = document.getElementById('roster-modal');
-let rosterMembers = [];
 let rosterCurrentIndex = 0;
 
-function buildRosterMembers() {
-    rosterMembers = [
-        { image: IMG_BASE + '野口監督_trimmed.jpg', number: '', name: '野口監督', romaji: '', role: '監督', cropLeft: true },
-        { image: IMG_BASE + 'その他/川﨑コーチ.jpg', number: '', name: '川﨑コーチ', romaji: '', role: 'コーチ', cropLeft: false }
-    ];
-    const excludeNums = ['13','39','99'];
-    if (currentSeason === 'u10') { excludeNums.push('6','28'); }
-    Object.entries(getPlayers())
-        .filter(([n]) => !excludeNums.includes(n) && PLAYER_IMAGES[n])
-        .sort((a,b) => Number(a[0]) - Number(b[0]))
-        .forEach(([num, p]) => {
-            rosterMembers.push({
-                image: IMG_BASE + '選手紹介用/' + PLAYER_IMAGES[num],
-                number: num,
-                name: p.name,
-                romaji: p.romaji,
-                role: '',
-                cropLeft: false
-            });
-        });
-}
+// buildRosterMembers is defined in the first script block
 buildRosterMembers();
 
 function showRosterMember(index) {
