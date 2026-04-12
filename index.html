@@ -695,17 +695,15 @@
     <div class="tab" onclick="switchTab('player')">
         <span class="tab-icon">&#128100;</span>マイ選手
     </div>
+    <div class="tab" onclick="switchTab('ops')">
+        <span class="tab-icon">&#128736;</span>運営
+    </div>
     <div class="tab" onclick="switchTab('history')">
         <span class="tab-icon">&#128214;</span>History
     </div>
     <div class="tab" onclick="switchTab('message')">
         <span class="tab-icon">&#9998;</span>監督より
     </div>
-    <!-- 会場タブ（データ準備中）
-    <div class="tab" onclick="switchTab('venues')">
-        <span class="tab-icon">&#128205;</span>会場
-    </div>
-    -->
 </div>
 
 <div class="season-tabs">
@@ -837,6 +835,23 @@
         <div id="venue-list"></div>
     </div>
 
+    <!-- OPS TAB -->
+    <div id="tab-ops" class="tab-content">
+        <div class="section-title">運営ツール</div>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
+            <a href="https://ssaito-spec.github.io/match-log/" target="_blank" style="display:flex;align-items:center;gap:12px;padding:16px;background:white;border-radius:12px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                <div style="width:44px;height:44px;background:#4a90d9;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">⚽</div>
+                <div>
+                    <div style="font-size:15px;font-weight:700;color:#1a1a1a;">らくらくスコア入力くん</div>
+                    <div style="font-size:12px;color:#888;margin-top:2px;">試合のスコアをリアルタイムで記録・共有</div>
+                </div>
+                <div style="margin-left:auto;color:#ccc;font-size:18px;">›</div>
+            </a>
+        </div>
+        <div class="section-title">お役立ちリンク</div>
+        <div style="font-size:13px;color:#888;padding:20px;text-align:center;">準備中です</div>
+    </div>
+
     <!-- MATCHES TAB -->
     <div id="tab-matches" class="tab-content">
         <div style="display:flex;gap:8px;margin-bottom:16px;">
@@ -863,7 +878,7 @@
 <div class="footer">
     <div style="background:#fff3e0;color:#e65100;padding:8px 16px;border-radius:8px;font-size:11px;font-weight:600;margin-bottom:12px;display:inline-block;">このサイトは関係者限定公開です。URLの外部共有はご遠慮ください。</div>
     <div id="footer-text">JACPA東京FC 2026年度 (U10) チームサイト</div>
-    <div style="font-size:10px;color:#bbb;margin-top:8px;">v3.0.0 — 2026.04.12</div>
+    <div style="font-size:10px;color:#bbb;margin-top:8px;">v3.1.0 — 2026.04.12</div>
 </div>
 
 <script>
@@ -1616,7 +1631,7 @@ const MATCH_DAYS_U10 = [
     {
         date: "2026-04-11", title: "TM vs 1FC川越水上公園", type: "tm",
         venue: "狭山グラウンド", weather: "", staff: [],
-        videos: [],
+        videos: [{ label: "TM vs 1FC川越水上公園", url: "https://youtube.com/playlist?list=PLDlLJNqV-A9WhUWSW5JAWef-9q-3DXecr" }],
         note: "U10初試合。12試合TM",
         games: [
             { n:1, o:"1FC川越水上公園", t:"tm", p:[2,3,5,8,23,25,29], g:[11], s:[0,1], sc:[], r:"L", detail:"[2,3,5,8,23,25,29]GK11" },
@@ -1672,7 +1687,9 @@ const ALL_VIDEOS_U9 = [
     { date:"2026-03-22", title:"TM（レイソルTOR）", url:"https://www.youtube.com/playlist?list=PLDlLJNqV-A9XknDOYYeKgGmyDWSBv4yOf" }
 ];
 
-const ALL_VIDEOS_U10 = [];
+const ALL_VIDEOS_U10 = [
+    { date:"2026-04-11", title:"TM vs 1FC川越水上公園", url:"https://youtube.com/playlist?list=PLDlLJNqV-A9WhUWSW5JAWef-9q-3DXecr" }
+];
 
 // ========== UTILITY FUNCTIONS ==========
 function playerName(num) {
@@ -1801,13 +1818,15 @@ function computePlayerStats(playerNum) {
     getMatchDays().forEach(md => {
         const playerGames = [];
         md.games.forEach(g => {
-            if (g.p.includes(playerNum)) {
+            const isField = g.p.includes(playerNum);
+            const isGK = g.g.includes(playerNum);
+            if (isField || isGK) {
                 appearances++;
                 const goalCount = g.sc.filter(s => s === playerNum).length;
                 goals += goalCount;
-                if (g.g.includes(playerNum)) gkGames++;
+                if (isGK) gkGames++;
                 if (g.r==="W") wins++; else if (g.r==="D") draws++; else losses++;
-                playerGames.push({ ...g, playerGoals: goalCount, isGK: g.g.includes(playerNum) });
+                playerGames.push({ ...g, playerGoals: goalCount, isGK });
             }
         });
         if (playerGames.length > 0) {
@@ -1821,7 +1840,7 @@ function computePlayerStats(playerNum) {
 // ========== TAB SWITCHING ==========
 function switchTab(tabName) {
     document.querySelectorAll('.tab').forEach((t, i) => {
-        t.classList.toggle('active', ['home','roster','matches','videos','player','history','message','venues'][i] === tabName);
+        t.classList.toggle('active', ['home','roster','matches','videos','player','ops','history','message'][i] === tabName);
     });
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById('tab-' + tabName).classList.add('active');
